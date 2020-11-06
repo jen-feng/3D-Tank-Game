@@ -159,52 +159,18 @@ bool loadObj(const char *fname,
 	return true;
 }
 
-void special(int key, int x, int y)
-{
-	/* arrow key presses move the camera */
-	/************************************************************************
-     
-                        CAMERA CONTROLS
-     
-     ************************************************************************/
-	switch (key)
-	{
-	case GLUT_KEY_DOWN:
-		pos[2] += 0.1f;
-		break;
-	case GLUT_KEY_LEFT:
-		pos[0] -= 0.1f;
-		break;
-	case GLUT_KEY_UP:
-		pos[2] -= 0.1f;
-	case GLUT_KEY_RIGHT:
-		pos[0] += 0.1f;
-	}
-	glutPostRedisplay();
-}
-
 void init(void)
 {
 	glClearColor(0, 0, 0, 0);
 	glColor3f(1, 1, 1);
-
-	/************************************************************************
-     
-                            PERSPECTIVE SET UP!
-     
-     modelview moves the eye and objects, projection is for camera type
-     frustum / ortho left, right, bottom, top, nearVal, farVal
-     
-     ************************************************************************/
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(-5, 5, -5, 5, -10, 20);
 }
 
-void drawTank(float *pos, float *rot)
+void drawTank()
 {
 	glPushMatrix();
-	glTranslatef(pos[0], pos[1], pos[2]);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
@@ -265,10 +231,7 @@ void display(void)
      
      ************************************************************************/
 	gluLookAt(eye[0], eye[1], eye[2], 0, 0, 0, 0, 1, 0);
-
-	// drawBox(origin, 10, 1, 10); //draws floor
-	// DrawSnowman(pos, rot);
-	drawTank(pos, rot);
+	drawTank();
 	glutSwapBuffers();
 }
 
@@ -285,7 +248,6 @@ int main(int argc, char **argv)
 	glutCreateWindow("Tank Example"); //creates the window
 
 	glutDisplayFunc(display); //registers "display" as the display callback function
-	glutSpecialFunc(special);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
