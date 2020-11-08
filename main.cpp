@@ -1,10 +1,11 @@
 #include "main.h"
+#include "tank.h"
 
 
 GLdouble eye[] = { 0, 1, -1};
 GLdouble lookAt[] = { 0, 1, 0};
 GLdouble up[] = { 0, 1, 0 };
-
+Tank tank1 = Tank();
 #define FPS 60
 #define TO_RADIANS 3.14159265/180.0
 
@@ -50,7 +51,7 @@ void display(){
 
     camera();
     draw();
-    
+    tank1.drawTank();
     
     glFlush();
 }
@@ -205,7 +206,7 @@ int main(int argc, char** argv){
 	glutMotionFunc(motion);
     glutPassiveMotionFunc(passiveMotion);
     
-    
+
     
     
 
