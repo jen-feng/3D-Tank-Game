@@ -17,8 +17,7 @@
 #include "tank.h"
 #include "world.h"
 
-
-void camera();
-void draw();
+#define FPS 60
+#define TO_RADIANS 3.14159265/180.0
 
 #endif

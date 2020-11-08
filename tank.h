@@ -4,14 +4,22 @@
 class tank{
 public: 
 
-float pos[2];
-int lives;
+    float pos[2];
+    int lives;
 
-tank();
-void drawTank();
-void shoot();
+    tank();
+    void drawTank();
+    void camera();
+    void shoot();
 
+    struct Motion
+    {
+        bool Forward,Backward,rLeft,rRight;
+    }movement;
 
+private:
+
+    float camX, camZ, yaw;
 
 };
 
