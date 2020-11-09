@@ -9,6 +9,7 @@ int size;
 
 world();
 void drawWorld();
+void drawAxis();
 
 
 };
