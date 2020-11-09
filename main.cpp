@@ -1,7 +1,7 @@
 #include "main.h"
 #include "tank.h"
 
-GLdouble eye[] = {0, 1.5, -1};
+GLdouble eye[] = {0, 1, 0};
 GLdouble lookAt[] = {0, 1, 0};
 GLdouble up[] = {0, 1, 0};
 Tank tank1 = Tank();
@@ -18,7 +18,7 @@ const int width = 16 * 50;
 const int height = 9 * 50;
 float pos[] = {0, 0, 0};
 float rot[] = {0, 0, 0};
-float angle = -135;
+float angle = 0;
 struct Motion
 {
     bool Forward, Backward, rLeft, rRight;
@@ -28,8 +28,12 @@ Motion movement = {false, false};
 
 void init(void)
 {
-    lookAt[0] = sin(angle) + eye[0];
-    lookAt[2] = -cos(angle) + eye[2];
+    lookAt[0] = sin(angle*TO_RADIANS) + eye[0];
+    lookAt[2] = cos(angle*TO_RADIANS) + eye[2];
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0, 0, 0, 0);
 
@@ -52,9 +56,10 @@ void display()
         lookAt[0], lookAt[1], lookAt[2],
         up[0], up[1], up[2]);
     draw();
-    glTranslatef(0, -1, 0);
+    //glTranslatef(1, -1, 0);
     glPushMatrix();
-    glTranslatef(lookAt[0], 0, lookAt[2]);
+    glTranslatef(eye[0], -1, eye[2]);
+    glRotatef(angle,0,1,0);
 
     tank1.drawTank();
     glPopMatrix();
@@ -63,9 +68,55 @@ void display()
 }
 void draw()
 {
-    for (int x = -25; x < size - 1 / 2.0; x++)
+
+     glColor3f(1.0,0.0,0.0); // red x
+    glBegin(GL_LINES);
+    // x aix
+ 
+    glVertex3f(-4.0, 0.0f, 0.0f);
+    glVertex3f(4.0, 0.0f, 0.0f);
+ 
+    // arrow
+    glVertex3f(4.0, 0.0f, 0.0f);
+    glVertex3f(3.0, 1.0f, 0.0f);
+ 
+    glVertex3f(4.0, 0.0f, 0.0f);
+    glVertex3f(3.0, -1.0f, 0.0f);
+    glEnd();
+
+ 
+ 
+ 
+    // y 
+    glColor3f(0.0,1.0,0.0); // green y
+    glBegin(GL_LINES);
+    glVertex3f(0.0, -4.0f, 0.0f);
+    glVertex3f(0.0, 4.0f, 0.0f);
+ 
+    // arrow
+    glVertex3f(0.0, 4.0f, 0.0f);
+    glVertex3f(1.0, 3.0f, 0.0f);
+ 
+    glVertex3f(0.0, 4.0f, 0.0f);
+    glVertex3f(-1.0, 3.0f, 0.0f);
+    glEnd();
+ 
+    // z 
+    glColor3f(0.0,0.0,1.0); // blue z
+    glBegin(GL_LINES);
+    glVertex3f(0.0, 0.0f ,-4.0f );
+    glVertex3f(0.0, 0.0f ,4.0f );
+ 
+    // arrow
+    glVertex3f(0.0, 0.0f ,4.0f );
+    glVertex3f(0.0, 1.0f ,3.0f );
+ 
+    glVertex3f(0.0, 0.0f ,4.0f );
+    glVertex3f(0.0, -1.0f ,3.0f );
+    glEnd();
+    for (int x = 0; x < size - 1; x++)
     {
-        for (int z = -25; z < size - 1 / 2.0; z++)
+        for (int z = 0; z < size - 1; z++)
         {
 
             glBegin(GL_QUADS);
@@ -189,29 +240,29 @@ void keyboard(unsigned char key, int x, int y)
     {
     case 'w':
     case 'W':
-        eye[0] += sin(angle) * 0.1;
-        lookAt[0] += sin(angle) * 0.1;
-        eye[2] -= cos(angle) * 0.1;
-        lookAt[2] -= cos(angle) * 0.1;
+        eye[0] += sin(angle*TO_RADIANS)* 0.2;
+        lookAt[0] += sin(angle*TO_RADIANS)* 0.2;
+        eye[2] += cos(angle*TO_RADIANS)* 0.2;
+        lookAt[2] += cos(angle*TO_RADIANS)* 0.2;
         break;
     case 'a':
     case 'A':
-        angle -= 0.1;
-        lookAt[0] = sin(angle) + eye[0];
-        lookAt[2] = -cos(angle) + eye[2];
+        angle++;
+        lookAt[0] = sin(angle*TO_RADIANS)+ eye[0];
+        lookAt[2] = cos(angle*TO_RADIANS)+ eye[2];
         break;
     case 's':
     case 'S':
-        eye[0] -= sin(angle) * 0.1;
-        lookAt[0] -= sin(angle) * 0.1;
-        eye[2] += cos(angle) * 0.1;
-        lookAt[2] += cos(angle) * 0.1;
+        eye[0] -= sin(angle*TO_RADIANS)* 0.2;
+        lookAt[0] -= sin(angle*TO_RADIANS)* 0.2;
+        eye[2] -= cos(angle*TO_RADIANS)* 0.2;
+        lookAt[2] -= cos(angle*TO_RADIANS)* 0.2;
         break;
     case 'd':
     case 'D':
-        angle += 0.1;
-        lookAt[0] = sin(angle) + eye[0];
-        lookAt[2] = -cos(angle) + eye[2];
+        angle--;
+        lookAt[0] = sin(angle*TO_RADIANS) + eye[0];
+        lookAt[2] = cos(angle*TO_RADIANS) + eye[2];
         break;
     }
     glutPostRedisplay();
