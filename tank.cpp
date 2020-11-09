@@ -148,6 +148,7 @@ void Tank::drawTank()
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
     glRotatef(-90, 1, 0, 0);
+    glRotatef(90, 0, 0, 1);
     glPushMatrix();
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
