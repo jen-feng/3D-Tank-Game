@@ -172,6 +172,8 @@ void keyboard(unsigned char key, int x, int y)
     {
     case 'w':
     case 'W':
+        tank1.movement.Forward = true;
+
         eye[0] += sin(angle * TO_RADIANS) * 0.2;
         lookAt[0] += sin(angle * TO_RADIANS) * 0.2;
         eye[2] += cos(angle * TO_RADIANS) * 0.2;
@@ -179,6 +181,8 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 'a':
     case 'A':
+        tank1.movement.Forward = true;
+
         angle++;
         lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
         lookAt[2] = cos(angle * TO_RADIANS) + eye[2];

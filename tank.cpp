@@ -167,8 +167,16 @@ void Tank::drawTank()
     glDisable(GL_LIGHTING);
 }
 
+void Tank::move(){
+
+}
+
 void Tank::shoot(){
-    glutSolidSphere(2, 100, 100);
+    
+}
+
+void Tank::projectileUpdate(){
+
 }
 
 void Tank::drawProjectile(){

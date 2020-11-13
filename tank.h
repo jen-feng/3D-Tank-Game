@@ -60,8 +60,17 @@ public:
     std::vector<std::vector<GLfloat>> normals;
     std::vector<char[255]> materials; // Name
 
+    struct Motion
+    {
+        bool Forward,Backward,rLeft,rRight;
+    }movement;
+
+    Motion direction = {false,false,false,false};
+
     float pos[3];
     float dir[3];
+    float projectile_pos[3];
+    float projectile_dir[3];
     int lives;
 
     Tank();
@@ -70,10 +79,12 @@ public:
                  std::vector<std::vector<GLfloat>> &out_vertices,
                  std::vector<std::vector<GLfloat>> &out_uvs,
                  std::vector<std::vector<GLfloat>> &out_normals);
+    void move();
+
     void shoot();
     void projectileUpdate();
     void drawProjectile();
-    void move();
+
 };
 
 #endif
