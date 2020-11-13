@@ -11,12 +11,16 @@ int x, y, mx, my;
 int size = 50;
 float pitch = 0.0, yaw = 0.0;
 float camX = 0.0, camZ = 0.0;
-int pat = 1;
+
 const int width = 16 * 50;
 const int height = 9 * 50;
 float pos[] = {0, 0, 0};
 float rot[] = {0, 0, 0};
 float angle = 0;
+
+float proj_pos[] = {0, 0, 0};
+float proj_dir[] = {0, 0, 0};
+bool fire = false;
 struct Motion
 {
     bool Forward, Backward, rLeft, rRight;
@@ -26,8 +30,8 @@ Motion movement = {false, false};
 
 void init(void)
 {
-    lookAt[0] = sin(angle*TO_RADIANS) + eye[0];
-    lookAt[2] = cos(angle*TO_RADIANS) + eye[2];
+    lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
+    lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -40,7 +44,6 @@ void init(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60, 16.0 / 9.0, 1, 75);
-    
 }
 
 void display()
@@ -48,18 +51,23 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
+    
     gluLookAt(
         eye[0], eye[1], eye[2],
         lookAt[0], lookAt[1], lookAt[2],
         up[0], up[1], up[2]);
+
+    
     map.drawWorld();
     glPushMatrix();
         glTranslatef(eye[0], -1, eye[2]);
-        glRotatef(angle,0,1,0);
-
+        glRotatef(angle, 0, 1, 0);
         tank1.drawTank();
     glPopMatrix();
+
+    if(fire){
+        drawProjectile();
+    }
 
     glFlush();
 }
@@ -99,6 +107,16 @@ void camera()
 void timer(int x)
 {
 
+    if(fire){
+        proj_pos[0] += proj_dir[0];
+        proj_pos[2] += proj_dir[2];
+
+        float len = sqrt((proj_pos[0]*proj_pos[0]) + (proj_pos[2]*proj_pos[2]));
+        if(len > 25){
+            fire = false;
+        }
+    }
+
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
@@ -126,35 +144,62 @@ void keyboard_up(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
+void shoot(){
+    proj_pos[0] = eye[0];
+    proj_pos[1] = eye[1];
+    proj_pos[2] = eye[2];
+
+    proj_dir[0] = lookAt[0];
+    proj_dir[1] = lookAt[1];
+    proj_dir[2] = lookAt[2];
+    fire=true;
+}
+
+void drawProjectile(){
+
+    glPushMatrix();
+        glTranslatef(proj_pos[0],proj_pos[1],proj_pos[2]);
+        glColor3f(0.5,0.5,0.5);
+        glScalef(0.2,0.2,0.2);
+        glutSolidSphere(1, 10, 10);
+    glPopMatrix();
+
+}
+
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
     case 'w':
     case 'W':
-        eye[0] += sin(angle*TO_RADIANS)* 0.2;
-        lookAt[0] += sin(angle*TO_RADIANS)* 0.2;
-        eye[2] += cos(angle*TO_RADIANS)* 0.2;
-        lookAt[2] += cos(angle*TO_RADIANS)* 0.2;
+        eye[0] += sin(angle * TO_RADIANS) * 0.2;
+        lookAt[0] += sin(angle * TO_RADIANS) * 0.2;
+        eye[2] += cos(angle * TO_RADIANS) * 0.2;
+        lookAt[2] += cos(angle * TO_RADIANS) * 0.2;
         break;
     case 'a':
     case 'A':
         angle++;
-        lookAt[0] = sin(angle*TO_RADIANS)+ eye[0];
-        lookAt[2] = cos(angle*TO_RADIANS)+ eye[2];
+        lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
+        lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
         break;
     case 's':
     case 'S':
-        eye[0] -= sin(angle*TO_RADIANS)* 0.2;
-        lookAt[0] -= sin(angle*TO_RADIANS)* 0.2;
-        eye[2] -= cos(angle*TO_RADIANS)* 0.2;
-        lookAt[2] -= cos(angle*TO_RADIANS)* 0.2;
+        eye[0] -= sin(angle * TO_RADIANS) * 0.2;
+        lookAt[0] -= sin(angle * TO_RADIANS) * 0.2;
+        eye[2] -= cos(angle * TO_RADIANS) * 0.2;
+        lookAt[2] -= cos(angle * TO_RADIANS) * 0.2;
         break;
     case 'd':
     case 'D':
         angle--;
-        lookAt[0] = sin(angle*TO_RADIANS) + eye[0];
-        lookAt[2] = cos(angle*TO_RADIANS) + eye[2];
+        lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
+        lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
+        break;
+    
+    case 32:
+
+        shoot();
         break;
     }
     glutPostRedisplay();
@@ -171,34 +216,6 @@ void mouse(int button, int state, int x, int y)
     {
         mb = false;
     }
-}
-
-void special(int key, int x, int y)
-{
-    switch (key)
-    {
-
-    case GLUT_KEY_LEFT:
-        pos[0] -= 0.1;
-        rot[1] = -90;
-        break;
-
-    case GLUT_KEY_UP:
-        pos[2] += 0.1;
-        rot[1] = 180;
-        break;
-
-    case GLUT_KEY_RIGHT:
-        pos[0] += 0.1;
-        rot[1] = 90;
-        break;
-
-    case GLUT_KEY_DOWN:
-        pos[2] -= 0.1;
-        rot[1] = 0;
-        break;
-    }
-    glutPostRedisplay();
 }
 
 void motion(int x, int y)
@@ -234,14 +251,14 @@ int main(int argc, char **argv)
 
     glutCreateWindow("Terrain");
 
-    //glutTimerFunc(1000/FPS,timer,0);
+    glutTimerFunc(1000/FPS,timer,0);
 
     init();
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
-    glutSpecialFunc(special);
+    //glutSpecialFunc(special);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutPassiveMotionFunc(passiveMotion);

@@ -71,6 +71,9 @@ public:
                  std::vector<std::vector<GLfloat>> &out_uvs,
                  std::vector<std::vector<GLfloat>> &out_normals);
     void shoot();
+    void projectileUpdate();
+    void drawProjectile();
+    void move();
 };
 
 #endif

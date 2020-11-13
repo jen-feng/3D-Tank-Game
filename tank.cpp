@@ -166,3 +166,11 @@ void Tank::drawTank()
     glPopMatrix();
     glDisable(GL_LIGHTING);
 }
+
+void Tank::shoot(){
+    glutSolidSphere(2, 100, 100);
+}
+
+void Tank::drawProjectile(){
+
+}
