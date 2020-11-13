@@ -1,18 +1,4 @@
-#include "tank.h"
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/freeglut.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-#include <string>
-#include <iostream>
+#include "main.h"
 
 Tank::Tank()
 {
@@ -179,4 +165,12 @@ void Tank::drawTank()
     glPopMatrix();
     glPopMatrix();
     glDisable(GL_LIGHTING);
+}
+
+void Tank::shoot(){
+    glutSolidSphere(2, 100, 100);
+}
+
+void Tank::drawProjectile(){
+
 }

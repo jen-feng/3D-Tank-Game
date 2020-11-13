@@ -15,6 +15,25 @@
 #include <string>
 #include <iostream>
 
+// class tank{
+// public: 
+
+//     float pos[2];
+//     int lives;
+
+//     tank();
+//     void drawTank();
+//     void camera();
+//     void shoot();
+
+//     struct Motion
+//     {
+//         bool Forward,Backward,rLeft,rRight;
+//     }movement;
+
+// private:
+
+//     float camX, camZ, yaw;
 class Tank
 {
 public:
@@ -40,6 +59,9 @@ public:
     std::vector<std::vector<GLfloat>> uvs;
     std::vector<std::vector<GLfloat>> normals;
     std::vector<char[255]> materials; // Name
+
+    float pos[3];
+    float dir[3];
     int lives;
 
     Tank();
@@ -49,6 +71,9 @@ public:
                  std::vector<std::vector<GLfloat>> &out_uvs,
                  std::vector<std::vector<GLfloat>> &out_normals);
     void shoot();
+    void projectileUpdate();
+    void drawProjectile();
+    void move();
 };
 
 #endif

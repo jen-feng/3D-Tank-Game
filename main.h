@@ -12,13 +12,17 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <iostream>
+#include <vector>
 #include <math.h>
+#include <string>
 #include "tank.h"
 #include "world.h"
 
+#define FPS 10
+#define TO_RADIANS 3.14159265/180.0
 
-void camera();
-void draw();
+void drawProjectile();
 
 #endif
