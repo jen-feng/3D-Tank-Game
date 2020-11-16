@@ -15,25 +15,6 @@
 #include <string>
 #include <iostream>
 
-// class tank{
-// public: 
-
-//     float pos[2];
-//     int lives;
-
-//     tank();
-//     void drawTank();
-//     void camera();
-//     void shoot();
-
-//     struct Motion
-//     {
-//         bool Forward,Backward,rLeft,rRight;
-//     }movement;
-
-// private:
-
-//     float camX, camZ, yaw;
 class Tank
 {
 public:
@@ -63,6 +44,9 @@ public:
     float pos[3];
     float dir[3];
     int lives;
+    int bullet_num = 20;
+    int bullet_id = 0;
+    std::vector<std::vector<GLfloat>> bullets;
 
     Tank();
     void drawTank();
@@ -70,7 +54,7 @@ public:
                  std::vector<std::vector<GLfloat>> &out_vertices,
                  std::vector<std::vector<GLfloat>> &out_uvs,
                  std::vector<std::vector<GLfloat>> &out_normals);
-    void shoot();
+    void shoot(GLfloat x, GLfloat z, GLfloat angle);
     void projectileUpdate();
     void drawProjectile();
     void move();
