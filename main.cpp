@@ -4,6 +4,7 @@ GLdouble eye[] = {0, 1.5, 0};
 GLdouble lookAt[] = {0, 1.2, 0};
 GLdouble up[] = {0, 1, 0};
 Tank tank1 = Tank();
+Tank tank2 = Tank();
 world map = world();
 
 bool mb = false;
@@ -17,11 +18,6 @@ const int height = 9 * 50;
 float pos[] = {0, 0, 0};
 float rot[] = {0, 0, 0};
 float angle = 0;
-
-int bullet_num = 20;
-int bullet_id = 0;
-
-std::vector<std::vector<GLfloat>> bullets;
 
 struct Motion
 {
@@ -64,67 +60,24 @@ void display()
     glTranslatef(eye[0], -1, eye[2]);
     glRotatef(angle, 0, 1, 0);
     tank1.drawTank();
-
     glPopMatrix();
-    for (int i = 0; i < bullets.size(); i++)
-    {
-        if (fabs(bullets[i][3]) >= GL_TRUE)
-        {
-            drawProjectile(bullets[i][0], bullets[i][1]);
-        }
-    }
+
+    tank1.drawProjectile();
+    
+    glPushMatrix();
+    glTranslatef(10, -0.9, 10);
+    tank2.drawTank();
+    glPopMatrix();
+
+
     glFlush();
 }
 
 void timer(int x)
 {
-
-    for (int i = 0; i < bullets.size(); i++)
-    {
-        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS)*3;
-        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS)*3;
-        float len = sqrt((bullets[i][0] * bullets[i][0]) + (bullets[i][1] * bullets[i][1]));
-        if (len > 60)
-        {
-            bullets[i][3] = GL_FALSE;
-        }
-    }
-
+    tank1.projectileUpdate();
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
-}
-
-void shoot()
-{
-
-    if (bullets.size() <= bullet_num)
-    {
-        std::vector<GLfloat> bullet;
-        bullet.push_back(eye[0]);
-        bullet.push_back(eye[2]);
-        bullet.push_back(angle);
-        bullet.push_back(GL_TRUE);
-        bullets.push_back(bullet);
-    }
-    else
-    {
-        bullet_id = (bullet_id+1) % bullet_num;
-        bullets[bullet_id][0] = eye[0];
-        bullets[bullet_id][1] = eye[2];
-        bullets[bullet_id][2] = angle;
-        bullets[bullet_id][3] = GL_TRUE;
-    }
-}
-
-void drawProjectile(GLfloat x, GLfloat z)
-{
-
-    glPushMatrix();
-    glTranslatef(x, 0.3, z);
-    glColor3f(0.5, 0.5, 0.5);
-    glScalef(0.2, 0.2, 0.2);
-    glutSolidSphere(1, 10, 10);
-    glPopMatrix();
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -160,7 +113,7 @@ void keyboard(unsigned char key, int x, int y)
 
     case 32:
 
-        shoot();
+        tank1.shoot(eye[0], eye[2], angle);
         break;
     }
     glutPostRedisplay();

@@ -167,10 +167,54 @@ void Tank::drawTank()
     glDisable(GL_LIGHTING);
 }
 
-void Tank::shoot(){
-    glutSolidSphere(2, 100, 100);
+void Tank::shoot(GLfloat x, GLfloat z, GLfloat angle)
+{
+
+    if (bullets.size() <= bullet_num)
+    {
+        std::vector<GLfloat> bullet;
+        bullet.push_back(x);
+        bullet.push_back(z);
+        bullet.push_back(angle);
+        bullet.push_back(GL_TRUE);
+        bullets.push_back(bullet);
+    }
+    else
+    {
+        bullet_id = (bullet_id + 1) % bullet_num;
+        bullets[bullet_id][0] = x;
+        bullets[bullet_id][1] = z;
+        bullets[bullet_id][2] = angle;
+        bullets[bullet_id][3] = GL_TRUE;
+    }
 }
 
-void Tank::drawProjectile(){
+void Tank::drawProjectile()
+{
+    for (int i = 0; i < bullets.size(); i++)
+    {
+        if (fabs(bullets[i][3]) >= GL_TRUE)
+        {
+            glPushMatrix();
+            glTranslatef(bullets[i][0], 0.3, bullets[i][1]);
+            glColor3f(0.5, 0.5, 0.5);
+            glScalef(0.2, 0.2, 0.2);
+            glutSolidSphere(1, 10, 10);
+            glPopMatrix();
+        }
+    }
+}
 
+void Tank::projectileUpdate()
+{
+    for (int i = 0; i < bullets.size(); i++)
+    {
+        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS)*3;
+        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS)*3;
+        float len = sqrt((bullets[i][0] * bullets[i][0]) + (bullets[i][1] * bullets[i][1]));
+        if (len > 60)
+        {
+            bullets[i][3] = GL_FALSE;
+        }
+    }
 }
