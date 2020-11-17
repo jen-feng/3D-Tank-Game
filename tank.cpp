@@ -1,19 +1,58 @@
 #include "main.h"
 
+// GLfloat amb[4] = {0.1, 0.1, 0.1, 1};
+// GLfloat diff[4] ={0.9, 0.9, 0.9, 1};
+// GLfloat spec[4] = {0.5, 0.5, 0.5, 1};
+// GLfloat m_ambient[4] = {0.329412f, 0.223529f, 0.027451f, 1.0f};
+// GLfloat m_diffuse[4] = {0.5f, 0.5f, 0.0f, 1.0f};
+// GLfloat m_specular[4] = {0.60f, 0.60f, 0.50f, 1.0f};
+// GLfloat m_shininess = 27.8974f;
+// int bullet_id = 0;
+
 Tank::Tank()
 {
+    light_pos[0] = -20; light_pos[1] = 20; light_pos[2] = 20; light_pos[3] = 1.0;
+    amb[0] = 0.1; amb[1] = 0.1; amb[2] = 0.1; amb[3] = 1;
+    diff[0] = 0.9; diff[1] = 0.9;diff[2] = 0.9;diff[3] = 1;
+    spec[0] = 0.5; spec[0] = 0.5; spec[0] = 0.5; spec[0] = 1;
+    m_ambient[0] = 0.329412f; m_ambient[1] = 0.223529f; m_ambient[2] = 0.027451f;  m_ambient[3] = 1.0f;
+    m_diffuse[0] = 0.5f; m_diffuse[1] = 0.5f; m_diffuse[2] = 0.0f; m_diffuse[3] = 1.0f;
+    m_specular[0] = 0.6f; m_specular[1] = 0.6f; m_specular[2] = 0.5f; m_specular[3] = 1.0f;
+    m_shininess = 27.8974f;
+    bullet_num = 20;
+
+    light_pos1[0] = 20;
+    light_pos1[1] = 20;
+    light_pos1[2] = -20;
+    light_pos1[3] = 5.0;
+
+    amb1[0] = 1.0f;
+    amb1[1] = 1.0f;
+    amb1[2] = 1.0f;
+    amb1[3] = 1.0f;
+
+    diff1[0] = 0;
+    diff1[1] = 0;
+    diff1[2] = 0;
+    diff1[3] = 1;
+
+    spec1[0] = 1;
+    spec1[1] = 1;
+    spec1[2] = 1;
+    spec1[3] = 1;
+
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
 }
 
 bool Tank::loadObj(const char *fname,
-                   std::vector<std::vector<GLfloat>> &out_vertices,
-                   std::vector<std::vector<GLfloat>> &out_uvs,
-                   std::vector<std::vector<GLfloat>> &out_normals)
+                   std::vector<std::vector<GLfloat> > &out_vertices,
+                   std::vector<std::vector<GLfloat> > &out_uvs,
+                   std::vector<std::vector<GLfloat> > &out_normals)
 {
     printf("Loading OBJ file %s...\n", fname);
-    std::vector<std::vector<GLfloat>> temp_vertices;
-    std::vector<std::vector<GLfloat>> temp_uvs;
-    std::vector<std::vector<GLfloat>> temp_normals;
+    std::vector<std::vector<GLfloat> > temp_vertices;
+    std::vector<std::vector<GLfloat> > temp_uvs;
+    std::vector<std::vector<GLfloat> > temp_normals;
     FILE *fp;
     int read;
     GLfloat x, y, z;
@@ -48,9 +87,9 @@ bool Tank::loadObj(const char *fname,
         {
             std::vector<GLfloat> vt;
             fscanf(fp, "%f %f\n", &x, &y);
-            vt.push_back(x);
-            vt.push_back(y);
-            temp_uvs.push_back(vt);
+            // vt.push_back(x);
+            // vt.push_back(y);
+            // temp_uvs.push_back(vt);
         }
         else if (strcmp(lineHeader, "vn") == 0)
         {
@@ -78,10 +117,10 @@ bool Tank::loadObj(const char *fname,
                 vertexIndices.push_back(vertexIndex[1]);
                 vertexIndices.push_back(vertexIndex[2]);
                 vertexIndices.push_back(vertexIndex[3]);
-                uvIndices.push_back(uvIndex[0]);
-                uvIndices.push_back(uvIndex[1]);
-                uvIndices.push_back(uvIndex[2]);
-                uvIndices.push_back(uvIndex[3]);
+                // uvIndices.push_back(uvIndex[0]);
+                // uvIndices.push_back(uvIndex[1]);
+                // uvIndices.push_back(uvIndex[2]);
+                // uvIndices.push_back(uvIndex[3]);
                 normalIndices.push_back(normalIndex[0]);
                 normalIndices.push_back(normalIndex[1]);
                 normalIndices.push_back(normalIndex[2]);
@@ -122,20 +161,23 @@ void Tank::drawTank()
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
-    for (unsigned int i = 0; i < 2; i++)
-    {
-        glLightfv(GL_LIGHT0 + i, GL_POSITION, light_pos[i]);
-        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diff[i]);
-        glLightfv(GL_LIGHT0 + i, GL_AMBIENT, amb[i]);
-        glLightfv(GL_LIGHT0 + i, GL_SPECULAR, spec[i]);
-    }
+
+    glLightfv(GL_LIGHT0 , GL_POSITION, light_pos);
+    glLightfv(GL_LIGHT0 , GL_DIFFUSE, diff);
+    glLightfv(GL_LIGHT0 , GL_AMBIENT, amb);
+    glLightfv(GL_LIGHT0 , GL_SPECULAR, spec);
+    glLightfv(GL_LIGHT1 , GL_POSITION, light_pos1);
+    glLightfv(GL_LIGHT1 , GL_DIFFUSE, diff1);
+    glLightfv(GL_LIGHT1 , GL_AMBIENT, amb1);
+    glLightfv(GL_LIGHT1 , GL_SPECULAR, spec1);
+
+    
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
     glRotatef(-90, 1, 0, 0);
     glRotatef(90, 0, 0, 1);
-    glPushMatrix();
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
 
@@ -149,35 +191,27 @@ void Tank::drawTank()
         glNormal3f(normals[normalIndices[i + 3] - 1][0], normals[normalIndices[i + 3] - 1][1], normals[normalIndices[i + 3] - 1][2]);
         glVertex3f(vertices[i + 3][0], vertices[i + 3][1], vertices[i + 3][2]);
         glEnd();
-        // glBegin(GL_QUADS);
-        // glNormal3f(normals[normalIndices[i] - 1][0], normals[normalIndices[i] - 1][1], normals[normalIndices[i] - 1][2]);
-        // glVertex3f(vertices[vertexIndices[i] - 1][0], vertices[vertexIndices[i] - 1][1], vertices[vertexIndices[i] - 1][2]);
-        // glNormal3f(normals[normalIndices[i + 1] - 1][0], normals[normalIndices[i + 1] - 1][1], normals[normalIndices[i + 1] - 1][2]);
-        // glVertex3f(vertices[vertexIndices[i + 1] - 1][0], vertices[vertexIndices[i + 1] - 1][1], vertices[vertexIndices[i + 1] - 1][2]);
-        // glNormal3f(normals[normalIndices[i + 2] - 1][0], normals[normalIndices[i + 2] - 1][1], normals[normalIndices[i + 2] - 1][2]);
-        // glVertex3f(vertices[vertexIndices[i + 2] - 1][0], vertices[vertexIndices[i + 2] - 1][1], vertices[vertexIndices[i + 2] - 1][2]);
-        // glNormal3f(normals[normalIndices[i + 3] - 1][0], normals[normalIndices[i + 3] - 1][1], normals[normalIndices[i + 3] - 1][2]);
-        // glVertex3f(vertices[vertexIndices[i + 3] - 1][0], vertices[vertexIndices[i + 3] - 1][1], vertices[vertexIndices[i + 3] - 1][2]);
-        // glEnd();
     }
 
     // glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(std::vector<std::vector<GLfloat>>), &vertices[0], GL_STATIC_DRAW);
-    glPopMatrix();
     glPopMatrix();
     glDisable(GL_LIGHTING);
 }
 
 void Tank::shoot(GLfloat x, GLfloat z, GLfloat angle)
 {
-
-    if (bullets.size() <= bullet_num)
+   
+    int size = bullets.size();
+    if (size <= bullet_num)
     {
+        
         std::vector<GLfloat> bullet;
         bullet.push_back(x);
         bullet.push_back(z);
         bullet.push_back(angle);
-        bullet.push_back(GL_TRUE);
+        bullet.push_back(1);
         bullets.push_back(bullet);
+        bullet.clear();
     }
     else
     {
@@ -185,7 +219,7 @@ void Tank::shoot(GLfloat x, GLfloat z, GLfloat angle)
         bullets[bullet_id][0] = x;
         bullets[bullet_id][1] = z;
         bullets[bullet_id][2] = angle;
-        bullets[bullet_id][3] = GL_TRUE;
+        bullets[bullet_id][3] = 1;
     }
 }
 
@@ -193,7 +227,7 @@ void Tank::drawProjectile()
 {
     for (int i = 0; i < bullets.size(); i++)
     {
-        if (fabs(bullets[i][3]) >= GL_TRUE)
+        if (fabs(bullets[i][3]) >= 1)
         {
             glPushMatrix();
             glTranslatef(bullets[i][0], 0.3, bullets[i][1]);
@@ -209,12 +243,12 @@ void Tank::projectileUpdate()
 {
     for (int i = 0; i < bullets.size(); i++)
     {
-        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS)*3;
-        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS)*3;
+        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS) * 3;
+        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS) * 3;
         float len = sqrt((bullets[i][0] * bullets[i][0]) + (bullets[i][1] * bullets[i][1]));
         if (len > 60)
         {
-            bullets[i][3] = GL_FALSE;
+            bullets[i][3] = 0;
         }
     }
 }

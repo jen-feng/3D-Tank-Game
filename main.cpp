@@ -154,5 +154,6 @@ int main(int argc, char **argv)
     // glutMotionFunc(motion);
     glutPassiveMotionFunc(passiveMotion);
     glutMainLoop();
+    tank1.bullets.clear();
     return (0);
 }
