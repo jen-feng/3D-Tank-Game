@@ -254,6 +254,7 @@ void Tank::move(unsigned char key){
 }
 void Tank::shoot()
 {
+    
    
     int size = bullets.size();
     if (size <= bullet_num)
@@ -275,22 +276,22 @@ void Tank::shoot()
         bullets[bullet_id][2] = angle;
         bullets[bullet_id][3] = 1;
     }
-
-    drawProjectile();
 } 
 
 void Tank::drawProjectile()
 {
+    
     for (int i = 0; i < bullets.size(); i++)
     {
         if (fabs(bullets[i][3]) >= 1)
         {
             glPushMatrix();
-            glTranslatef(bullets[i][0], 0.3, bullets[i][1]);
-            glColor3f(0.5, 0.5, 0.5);
-            glScalef(0.2, 0.2, 0.2);
-            glutSolidSphere(1, 10, 10);
+                glTranslatef(bullets[i][0], 1, bullets[i][1]);
+                glColor3f(0.5, 0.5, 0.5);
+                glScalef(0.2, 0.2, 0.2);
+                glutSolidSphere(1, 10, 10);
             glPopMatrix();
+            glutPostRedisplay();
         }
     }
 }
@@ -307,5 +308,4 @@ void Tank::projectileUpdate()
             bullets[i][3] = 0;
         }
     }
-    drawProjectile();
 }

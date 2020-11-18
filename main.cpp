@@ -1,23 +1,17 @@
 #include "main.h"
 
-GLdouble eye[] = {0, 1.5, 0};
-GLdouble lookAt[] = {0, 1.2, 0};
+GLdouble eye[] = {0, 1, 0};
+GLdouble lookAt[] = {0, 1, 0};
 GLdouble up[] = {0, 1, 0};
 Tank tank1 = Tank();
-Tank tank2 = Tank();
+//Tank tank2 = Tank();
 world map = world();
 
 bool mb = false;
 int x, y, mx, my;
-int size = 50;
-float pitch = 0.0, yaw = 0.0;
-float camX = 0.0, camZ = 0.0;
 
 const int width = 16 * 50;
 const int height = 9 * 50;
-float pos[] = {0, 0, 0};
-float rot[] = {0, 0, 0};
-float angle = 0;
 
 void init(void)
 {
@@ -50,8 +44,7 @@ void display()
 
     tank1.drawTank();
 
-
-    //tank1.drawProjectile();
+    tank1.drawProjectile();
     
     // glPushMatrix();
     // glTranslatef(10, -0.9, 10);
