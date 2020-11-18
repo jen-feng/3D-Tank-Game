@@ -19,17 +19,8 @@ float pos[] = {0, 0, 0};
 float rot[] = {0, 0, 0};
 float angle = 0;
 
-struct Motion
-{
-    bool Forward, Backward, rLeft, rRight;
-};
-
-Motion movement = {false, false};
-
 void init(void)
 {
-    lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
-    lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -51,24 +42,21 @@ void display()
     glLoadIdentity();
 
     gluLookAt(
-        eye[0], eye[1], eye[2],
-        lookAt[0], lookAt[1], lookAt[2],
+        tank1.pos[0], eye[1], tank1.pos[2],
+        tank1.dir[0], lookAt[1], tank1.dir[2],
         up[0], up[1], up[2]);
 
     map.drawWorld();
-    glPushMatrix();
-    glTranslatef(eye[0], -1, eye[2]);
-    glRotatef(angle, 0, 1, 0);
+
     tank1.drawTank();
-    glPopMatrix();
 
-    tank1.drawProjectile();
+
+    //tank1.drawProjectile();
     
-    glPushMatrix();
-    glTranslatef(10, -0.9, 10);
-    tank2.drawTank();
-    glPopMatrix();
-
+    // glPushMatrix();
+    // glTranslatef(10, -0.9, 10);
+    // tank2.drawTank();
+    // glPopMatrix();
 
     glFlush();
 }
@@ -82,38 +70,21 @@ void timer(int x)
 
 void keyboard(unsigned char key, int x, int y)
 {
+
     switch (key)
     {
     case 'w':
     case 'W':
-        eye[0] += sin(angle * TO_RADIANS) * 0.2;
-        lookAt[0] += sin(angle * TO_RADIANS) * 0.2;
-        eye[2] += cos(angle * TO_RADIANS) * 0.2;
-        lookAt[2] += cos(angle * TO_RADIANS) * 0.2;
-        break;
     case 'a':
     case 'A':
-        angle++;
-        lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
-        lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
-        break;
     case 's':
     case 'S':
-        eye[0] -= sin(angle * TO_RADIANS) * 0.2;
-        lookAt[0] -= sin(angle * TO_RADIANS) * 0.2;
-        eye[2] -= cos(angle * TO_RADIANS) * 0.2;
-        lookAt[2] -= cos(angle * TO_RADIANS) * 0.2;
-        break;
     case 'd':
     case 'D':
-        angle--;
-        lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
-        lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
+        tank1.move(key);
         break;
-
     case 32:
-
-        tank1.shoot(eye[0], eye[2], angle);
+        tank1.shoot();
         break;
     }
     glutPostRedisplay();

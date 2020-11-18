@@ -42,6 +42,13 @@ Tank::Tank()
     spec1[3] = 1;
 
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
+
+    pos[0] = 0; pos[1] = 1; pos[2] = 0;
+
+    angle = 0;
+    dir[0] = sin(angle * TO_RADIANS) + pos[0];
+    dir[1] = 1;
+    dir[2] = cos(angle * TO_RADIANS) + pos[2];
 }
 
 bool Tank::loadObj(const char *fname,
@@ -153,7 +160,12 @@ bool Tank::loadObj(const char *fname,
 
 void Tank::drawTank()
 {
+
+    
+
     glPushMatrix();
+    glTranslatef(pos[0], -1, pos[2]);
+    glRotatef(angle, 0, 1, 0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -178,6 +190,9 @@ void Tank::drawTank()
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
     glRotatef(-90, 1, 0, 0);
     glRotatef(90, 0, 0, 1);
+
+    glPushMatrix();
+
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
 
@@ -198,7 +213,46 @@ void Tank::drawTank()
     glDisable(GL_LIGHTING);
 }
 
-void Tank::shoot(GLfloat x, GLfloat z, GLfloat angle)
+  
+void Tank::move(unsigned char key){
+
+    if(key == 'W'||key == 'w'){
+
+        pos[0] += sin(angle * TO_RADIANS) * 0.2;
+        pos[2] += cos(angle * TO_RADIANS) * 0.2;
+
+        dir[0] += sin(angle * TO_RADIANS) * 0.2;
+        dir[2] += cos(angle * TO_RADIANS) * 0.2;
+
+    }
+    if(key == 'A'||key == 'a'){
+
+        angle++;
+
+        dir[0] = sin(angle * TO_RADIANS) + pos[0];
+        dir[2] = cos(angle * TO_RADIANS) + pos[2];
+        
+    }
+    if(key == 'S'||key == 's'){
+
+        pos[0] -= sin(angle * TO_RADIANS) * 0.2;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.2;
+
+        dir[0] -= sin(angle * TO_RADIANS) * 0.2;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.2;
+        
+    }
+    if(key == 'D'||key == 'd'){
+
+        angle--;
+
+        dir[0] = sin(angle * TO_RADIANS) + pos[0];
+        dir[2] = cos(angle * TO_RADIANS) + pos[2];
+        
+    }
+
+}
+void Tank::shoot()
 {
    
     int size = bullets.size();
@@ -206,8 +260,8 @@ void Tank::shoot(GLfloat x, GLfloat z, GLfloat angle)
     {
         
         std::vector<GLfloat> bullet;
-        bullet.push_back(x);
-        bullet.push_back(z);
+        bullet.push_back(pos[0]);
+        bullet.push_back(pos[2]);
         bullet.push_back(angle);
         bullet.push_back(1);
         bullets.push_back(bullet);
@@ -216,12 +270,14 @@ void Tank::shoot(GLfloat x, GLfloat z, GLfloat angle)
     else
     {
         bullet_id = (bullet_id + 1) % bullet_num;
-        bullets[bullet_id][0] = x;
-        bullets[bullet_id][1] = z;
+        bullets[bullet_id][0] = pos[0];
+        bullets[bullet_id][1] = pos[2];
         bullets[bullet_id][2] = angle;
         bullets[bullet_id][3] = 1;
     }
-}
+
+    drawProjectile();
+} 
 
 void Tank::drawProjectile()
 {
@@ -251,4 +307,5 @@ void Tank::projectileUpdate()
             bullets[i][3] = 0;
         }
     }
+    drawProjectile();
 }
