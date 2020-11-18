@@ -37,8 +37,21 @@ public:
     std::vector<std::vector<GLfloat> > normals;
     std::vector<char[255]> materials; // Name
 
+    struct Motion
+    {
+    bool Forward, Backward, rLeft, rRight;
+    }movement;
+    
     float pos[3];
     float dir[3];
+
+    float camPos[3];
+    float camDir[3];
+    float dolly;//left right
+    float truck;//forward back
+    float boom; //up down
+    float tilt; //look up look down
+
     float angle;
     float projectile_pos[3];
     float projectile_dir[3];
@@ -54,7 +67,8 @@ public:
                  std::vector<std::vector<GLfloat> > &out_uvs,
                  std::vector<std::vector<GLfloat> > &out_normals);
     void shoot();
-    void move(unsigned char key);
+    void move();
+    void camera();
     
     void projectileUpdate();
     void drawProjectile();

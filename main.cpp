@@ -26,7 +26,7 @@ void init(void)
     glDepthFunc(GL_LEQUAL);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, 16.0 / 9.0, 1, 75);
+    gluPerspective(60, 16.0 / 9.0, 0, 75);
 }
 
 void display()
@@ -36,16 +36,18 @@ void display()
     glLoadIdentity();
 
     gluLookAt(
-        tank1.pos[0], eye[1], tank1.pos[2],
-        tank1.dir[0], lookAt[1], tank1.dir[2],
+        tank1.camPos[0], tank1.camPos[1], tank1.camPos[2],
+        tank1.camDir[0], tank1.camDir[1], tank1.camDir[2],
         up[0], up[1], up[2]);
+    
 
     map.drawWorld();
 
+    tank1.drawProjectile();
+
     tank1.drawTank();
 
-    tank1.drawProjectile();
-    
+
     // glPushMatrix();
     // glTranslatef(10, -0.9, 10);
     // tank2.drawTank();
@@ -60,6 +62,30 @@ void timer(int x)
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
+void keyboard_up(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case 'w':
+    case 'W':
+        tank1.movement.Forward = false;
+        break;
+    case 'a':
+    case 'A':
+        tank1.movement.rLeft = false;
+        break;
+    case 's':
+    case 'S':
+        tank1.movement.Backward = false;
+        break;
+    case 'd':
+    case 'D':
+        tank1.movement.rRight = false;
+        break;
+    }
+    tank1.move();
+    glutPostRedisplay();
+}
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -68,23 +94,61 @@ void keyboard(unsigned char key, int x, int y)
     {
     case 'w':
     case 'W':
+        tank1.movement.Forward = true;
+        break;
     case 'a':
     case 'A':
+        tank1.movement.rLeft = true;
+        break;
     case 's':
     case 'S':
+        tank1.movement.Backward = true;
+        break;
     case 'd':
     case 'D':
-        tank1.move(key);
+        tank1.movement.rRight = true;
         break;
     case 32:
         tank1.shoot();
         break;
     }
+    tank1.move();
     glutPostRedisplay();
 }
-
-void passiveMotion(int x, int y)
+void special(int key, int x, int y)
 {
+    if(key == GLUT_KEY_RIGHT)
+    {
+        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
+            tank1.tilt += 0.1;
+        else
+            tank1.dolly += 0.1;
+    }
+    if(key == GLUT_KEY_LEFT)
+    {
+        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
+            tank1.tilt -= 0.1;
+        else
+            tank1.dolly -= 0.1;
+    }
+    if(key == GLUT_KEY_UP)
+    {
+        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
+            tank1.boom += 0.1;
+        else
+            tank1.truck += 0.1;
+        
+    }
+    if(key == GLUT_KEY_DOWN)
+    {
+        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
+            tank1.boom -= 0.1;
+        else
+            tank1.truck -= 0.1;
+        
+    }
+    tank1.camera();
+    glutPostRedisplay();
 }
 
 void reshape(int w, int h)
@@ -112,11 +176,11 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
-    // glutKeyboardUpFunc(keyboard_up);
-    //glutSpecialFunc(special);
+    glutKeyboardUpFunc(keyboard_up);
+    glutSpecialFunc(special);
     // glutMouseFunc(mouse);
     // glutMotionFunc(motion);
-    glutPassiveMotionFunc(passiveMotion);
+    // glutPassiveMotionFunc(passiveMotion);
     glutMainLoop();
     tank1.bullets.clear();
     return (0);

@@ -34,12 +34,21 @@ Tank::Tank()
 
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
 
+    Motion movement = {false,false,false,false};
+
     pos[0] = 0; pos[1] = 1; pos[2] = 0;
 
     angle = 0;
     dir[0] = sin(angle * TO_RADIANS) + pos[0];
     dir[1] = 1;
     dir[2] = cos(angle * TO_RADIANS) + pos[2];
+
+    truck = 0.1;
+    dolly = 0;
+    boom = 0;
+    tilt = 0;
+
+    camera();
 }
 
 bool Tank::loadObj(const char *fname,
@@ -204,9 +213,9 @@ void Tank::drawTank()
 }
 
   
-void Tank::move(unsigned char key){
+void Tank::move(){
 
-    if(key == 'W'||key == 'w'){
+    if(movement.Forward){
 
         pos[0] += sin(angle * TO_RADIANS) * 0.2;
         pos[2] += cos(angle * TO_RADIANS) * 0.2;
@@ -215,15 +224,15 @@ void Tank::move(unsigned char key){
         dir[2] += cos(angle * TO_RADIANS) * 0.2;
 
     }
-    if(key == 'A'||key == 'a'){
+    if(movement.rLeft){
 
         angle++;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
-        dir[2] = cos(angle * TO_RADIANS) + pos[2];
+        dir[2] = cos(angle * TO_RADIANS) + pos[2];      
         
     }
-    if(key == 'S'||key == 's'){
+    if(movement.Backward){
 
         pos[0] -= sin(angle * TO_RADIANS) * 0.2;
         pos[2] -= cos(angle * TO_RADIANS) * 0.2;
@@ -232,14 +241,24 @@ void Tank::move(unsigned char key){
         dir[2] -= cos(angle * TO_RADIANS) * 0.2;
         
     }
-    if(key == 'D'||key == 'd'){
+    if(movement.rRight){
 
         angle--;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
-        
     }
+    camera();
+}
+void Tank::camera()
+{
+    camPos[0] = ((sin(angle * TO_RADIANS) * truck) + pos[0]) + (sin((angle-90) * TO_RADIANS)*dolly);
+    camPos[1] = pos[1] + boom;
+    camPos[2] = ((cos(angle * TO_RADIANS) * truck) + pos[2]) + (cos((angle-90) * TO_RADIANS)*dolly);
+
+    camDir[0] = ((sin((angle-90) * TO_RADIANS)*dolly) + dir[0]);
+    camDir[1] = (dir[1] + boom) + tilt;
+    camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
 
 }
 void Tank::shoot()
