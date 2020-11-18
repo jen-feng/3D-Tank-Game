@@ -69,6 +69,7 @@ public:
 
     float pos[3];
     float dir[3];
+    float angle;
     float projectile_pos[3];
     float projectile_dir[3];
     int lives;
@@ -79,7 +80,7 @@ public:
                  std::vector<std::vector<GLfloat>> &out_vertices,
                  std::vector<std::vector<GLfloat>> &out_uvs,
                  std::vector<std::vector<GLfloat>> &out_normals);
-    void move();
+    void move(unsigned char key);
 
     void shoot();
     void projectileUpdate();

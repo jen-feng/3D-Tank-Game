@@ -3,6 +3,13 @@
 Tank::Tank()
 {
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
+
+    pos[0] = 0; pos[1] = 1; pos[2] = 0;
+
+    angle = 0;
+    dir[0] = sin(angle * TO_RADIANS) + pos[0];
+    dir[1] = 1;
+    dir[2] = cos(angle * TO_RADIANS) + pos[2];
 }
 
 bool Tank::loadObj(const char *fname,
@@ -114,7 +121,12 @@ bool Tank::loadObj(const char *fname,
 
 void Tank::drawTank()
 {
+
+    
+
     glPushMatrix();
+    glTranslatef(pos[0], -1, pos[2]);
+    glRotatef(angle, 0, 1, 0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -135,7 +147,9 @@ void Tank::drawTank()
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
     glRotatef(-90, 1, 0, 0);
     glRotatef(90, 0, 0, 1);
+
     glPushMatrix();
+
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
 
@@ -167,7 +181,42 @@ void Tank::drawTank()
     glDisable(GL_LIGHTING);
 }
 
-void Tank::move(){
+void Tank::move(unsigned char key){
+
+    if(key == 'W'||key == 'w'){
+
+        pos[0] += sin(angle * TO_RADIANS) * 0.2;
+        pos[2] += cos(angle * TO_RADIANS) * 0.2;
+
+        dir[0] += sin(angle * TO_RADIANS) * 0.2;
+        dir[2] += cos(angle * TO_RADIANS) * 0.2;
+
+    }
+    if(key == 'A'||key == 'a'){
+
+        angle++;
+
+        dir[0] = sin(angle * TO_RADIANS) + pos[0];
+        dir[2] = cos(angle * TO_RADIANS) + pos[2];
+        
+    }
+    if(key == 'S'||key == 's'){
+
+        pos[0] -= sin(angle * TO_RADIANS) * 0.2;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.2;
+
+        dir[0] -= sin(angle * TO_RADIANS) * 0.2;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.2;
+        
+    }
+    if(key == 'D'||key == 'd'){
+
+        angle--;
+
+        dir[0] = sin(angle * TO_RADIANS) + pos[0];
+        dir[2] = cos(angle * TO_RADIANS) + pos[2];
+        
+    }
 
 }
 

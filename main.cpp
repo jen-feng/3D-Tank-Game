@@ -30,8 +30,6 @@ Motion movement = {false, false};
 
 void init(void)
 {
-    lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
-    lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -53,55 +51,21 @@ void display()
     glLoadIdentity();
     
     gluLookAt(
-        eye[0], eye[1], eye[2],
-        lookAt[0], lookAt[1], lookAt[2],
+        tank1.pos[0], eye[1], tank1.pos[2],
+        tank1.dir[0], lookAt[1], tank1.dir[2],
         up[0], up[1], up[2]);
 
     
     map.drawWorld();
-    glPushMatrix();
-        glTranslatef(eye[0], -1, eye[2]);
-        glRotatef(angle, 0, 1, 0);
-        tank1.drawTank();
-    glPopMatrix();
+
+    tank1.drawTank();
+
 
     if(fire){
         drawProjectile();
     }
 
     glFlush();
-}
-void camera()
-{
-    if (movement.Forward)
-    {
-        camX += cos((yaw + 90 + 180) * TO_RADIANS) / 5.0;
-        camZ -= sin((yaw + 90 + 180) * TO_RADIANS) / 5.0;
-    }
-    if (movement.Backward)
-    {
-        camX += cos((yaw + 90) * TO_RADIANS) / 5.0;
-        camZ -= sin((yaw + 90) * TO_RADIANS) / 5.0;
-    }
-    if (movement.rLeft)
-    {
-        yaw++;
-    }
-    if (movement.rRight)
-    {
-        yaw--;
-    }
-
-    if (yaw > 360)
-    {
-        yaw = 0;
-    }
-    if (yaw < 0)
-    {
-        yaw = 360;
-    }
-    glRotatef(-yaw, 0, 1, 0);
-    glTranslatef(-camX, 0.0, -camZ);
 }
 
 void timer(int x)
@@ -168,39 +132,19 @@ void drawProjectile(){
 
 void keyboard(unsigned char key, int x, int y)
 {
+
     switch (key)
     {
     case 'w':
     case 'W':
-        tank1.movement.Forward = true;
-
-        eye[0] += sin(angle * TO_RADIANS) * 0.2;
-        lookAt[0] += sin(angle * TO_RADIANS) * 0.2;
-        eye[2] += cos(angle * TO_RADIANS) * 0.2;
-        lookAt[2] += cos(angle * TO_RADIANS) * 0.2;
-        break;
     case 'a':
     case 'A':
-        tank1.movement.Forward = true;
-
-        angle++;
-        lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
-        lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
-        break;
     case 's':
     case 'S':
-        eye[0] -= sin(angle * TO_RADIANS) * 0.2;
-        lookAt[0] -= sin(angle * TO_RADIANS) * 0.2;
-        eye[2] -= cos(angle * TO_RADIANS) * 0.2;
-        lookAt[2] -= cos(angle * TO_RADIANS) * 0.2;
-        break;
     case 'd':
     case 'D':
-        angle--;
-        lookAt[0] = sin(angle * TO_RADIANS) + eye[0];
-        lookAt[2] = cos(angle * TO_RADIANS) + eye[2];
+        tank1.move(key);
         break;
-    
     case 32:
 
         shoot();
