@@ -1,14 +1,5 @@
 #include "main.h"
 
-// GLfloat amb[4] = {0.1, 0.1, 0.1, 1};
-// GLfloat diff[4] ={0.9, 0.9, 0.9, 1};
-// GLfloat spec[4] = {0.5, 0.5, 0.5, 1};
-// GLfloat m_ambient[4] = {0.329412f, 0.223529f, 0.027451f, 1.0f};
-// GLfloat m_diffuse[4] = {0.5f, 0.5f, 0.0f, 1.0f};
-// GLfloat m_specular[4] = {0.60f, 0.60f, 0.50f, 1.0f};
-// GLfloat m_shininess = 27.8974f;
-// int bullet_id = 0;
-
 Tank::Tank()
 {
     light_pos[0] = -20; light_pos[1] = 20; light_pos[2] = 20; light_pos[3] = 1.0;
@@ -70,8 +61,7 @@ bool Tank::loadObj(const char *fname,
         printf("can't open file %s\n", fname);
         exit(1);
     }
-    // glNewList(tank, GL_COMPILE);
-    // {
+
     while (1)
     {
         char lineHeader[128];
@@ -135,7 +125,7 @@ bool Tank::loadObj(const char *fname,
             }
         }
     }
-    // glEndList();
+
     for (unsigned int i = 0; i < vertexIndices.size(); i++)
     {
 
@@ -162,7 +152,7 @@ void Tank::drawTank()
 {
 
     
-
+    drawProjectile();
     glPushMatrix();
     glTranslatef(pos[0], -1, pos[2]);
     glRotatef(angle, 0, 1, 0);
@@ -208,9 +198,9 @@ void Tank::drawTank()
         glEnd();
     }
 
-    // glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(std::vector<std::vector<GLfloat>>), &vertices[0], GL_STATIC_DRAW);
     glPopMatrix();
     glDisable(GL_LIGHTING);
+    
 }
 
   
@@ -276,7 +266,6 @@ void Tank::shoot()
         bullets[bullet_id][3] = 1;
     }
 
-    drawProjectile();
 } 
 
 void Tank::drawProjectile()
@@ -307,5 +296,4 @@ void Tank::projectileUpdate()
             bullets[i][3] = 0;
         }
     }
-    drawProjectile();
 }

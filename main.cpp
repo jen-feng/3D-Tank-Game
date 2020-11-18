@@ -50,14 +50,6 @@ void display()
 
     tank1.drawTank();
 
-
-    //tank1.drawProjectile();
-    
-    // glPushMatrix();
-    // glTranslatef(10, -0.9, 10);
-    // tank2.drawTank();
-    // glPopMatrix();
-
     glFlush();
 }
 
