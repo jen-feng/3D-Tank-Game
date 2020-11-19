@@ -15,7 +15,6 @@ Up | Forward
 Down | Back
 Right | Right
 Left | Left
-
 Shift + Up | Up
 Shift + Down | Down
 Shift + Right | Look Up
