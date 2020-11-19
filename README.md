@@ -7,6 +7,7 @@ W | Forward
 A | Rotate Left
 S | Backwards
 D | Rotate Right
+Space| Fire Gun
 
 **Camera**
 Key | Movement
