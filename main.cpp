@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(width, height);
 
-    glutCreateWindow("Terrain");
+    glutCreateWindow("Tank Game");
 
     glutTimerFunc(1000 / FPS, timer, 0);
 
