@@ -1,18 +1,22 @@
 Reference for the obj file: https://free3d.com/3d-model/wwii-tank-uk-cromwell-v1--490653.html
 
-Movement
-W - Forward
-A - Rotate Left
-S - Backwards
-D - Rotate Right
+**Movement**
+Key | Movement
+----|---------
+W | Forward
+A | Rotate Left
+S | Backwards
+D | Rotate Right
 
-Camera
-Up    - Forward
-Down  - Back
-Right - Right
-Left  - Left
+**Camera**
+Key | Movement
+----|---------
+Up | Forward
+Down | Back
+Right | Right
+Left | Left
 
-Shift + Up    - Up
-Shift + Down  - Down
-Shift + Right - Look Up
-Shift + Left  - Look Down
+Shift + Up | Up
+Shift + Down | Down
+Shift + Right | Look Up
+Shift + Left  | Look Down
