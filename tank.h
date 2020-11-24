@@ -53,9 +53,9 @@ public:
     float tilt; //look up look down
 
     float angle;
-    float projectile_pos[3];
-    float projectile_dir[3];
+
     int lives;
+    int score;
     int bullet_num;
     int bullet_id;
     std::vector<std::vector<GLfloat> > bullets;
@@ -68,10 +68,35 @@ public:
                  std::vector<std::vector<GLfloat> > &out_normals);
     void shoot();
     void move();
-    void camera();
     
     void projectileUpdate();
     void drawProjectile();
+
+};
+
+class Player: public Tank
+{
+    public:
+
+    Player();
+
+    void playerMove();
+    void updateCamera();
+    void draw();
+    void drawHUD();
+    void drawText(float x, float y, char *inString, int val);
+};
+
+class Enemy: public Tank
+{
+    public:
+
+    Enemy(float x, float y, float z, float ang);
+
+    void findPath(float x, float z);
+    void updatePosition();
+
+    void draw();
 
 };
 

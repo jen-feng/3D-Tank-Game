@@ -2,20 +2,16 @@
 
 Tank::Tank()
 {
-    light_pos[0] = -20; light_pos[1] = 20; light_pos[2] = 20; light_pos[3] = 1.0;
-    amb[0] = 0.1; amb[1] = 0.1; amb[2] = 0.1; amb[3] = 1;
+    light_pos[0] = -5; light_pos[1] = 5; light_pos[2] = 5; light_pos[3] = 1.0;
+    amb[0] = 0.5; amb[1] = 0.5; amb[2] = 0.5; amb[3] = 1.0;
     diff[0] = 0.9; diff[1] = 0.9;diff[2] = 0.9;diff[3] = 1;
     spec[0] = 0.5; spec[0] = 0.5; spec[0] = 0.5; spec[0] = 1;
-    m_ambient[0] = 0.329412f; m_ambient[1] = 0.223529f; m_ambient[2] = 0.027451f;  m_ambient[3] = 1.0f;
-    m_diffuse[0] = 0.5f; m_diffuse[1] = 0.5f; m_diffuse[2] = 0.0f; m_diffuse[3] = 1.0f;
-    m_specular[0] = 0.6f; m_specular[1] = 0.6f; m_specular[2] = 0.5f; m_specular[3] = 1.0f;
-    m_shininess = 27.8974f;
     bullet_num = 20;
 
-    light_pos1[0] = 20;
-    light_pos1[1] = 20;
-    light_pos1[2] = -20;
-    light_pos1[3] = 5.0;
+    light_pos1[0] = 5;
+    light_pos1[1] = 5;
+    light_pos1[2] = -5;
+    light_pos1[3] = 1.0;
 
     amb1[0] = 1.0f;
     amb1[1] = 1.0f;
@@ -32,23 +28,12 @@ Tank::Tank()
     spec1[2] = 1;
     spec1[3] = 1;
 
-    loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
-
     Motion movement = {false,false,false,false};
 
-    pos[0] = 0; pos[1] = 1; pos[2] = 0;
+    lives = 3;
+    score = 0;
 
-    angle = 0;
-    dir[0] = sin(angle * TO_RADIANS) + pos[0];
-    dir[1] = 1;
-    dir[2] = cos(angle * TO_RADIANS) + pos[2];
 
-    truck = 0.1;
-    dolly = 0;
-    boom = 0;
-    tilt = 0;
-
-    camera();
 }
 
 bool Tank::loadObj(const char *fname,
@@ -159,28 +144,23 @@ bool Tank::loadObj(const char *fname,
 
 void Tank::drawTank()
 {
-
     
-    drawProjectile();
-    glPushMatrix();
-    glTranslatef(pos[0], -1, pos[2]);
-    glRotatef(angle, 0, 1, 0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
+    //glEnable(GL_LIGHT1);
 
     glLightfv(GL_LIGHT0 , GL_POSITION, light_pos);
     glLightfv(GL_LIGHT0 , GL_DIFFUSE, diff);
     glLightfv(GL_LIGHT0 , GL_AMBIENT, amb);
     glLightfv(GL_LIGHT0 , GL_SPECULAR, spec);
-    glLightfv(GL_LIGHT1 , GL_POSITION, light_pos1);
-    glLightfv(GL_LIGHT1 , GL_DIFFUSE, diff1);
-    glLightfv(GL_LIGHT1 , GL_AMBIENT, amb1);
-    glLightfv(GL_LIGHT1 , GL_SPECULAR, spec1);
+    // glLightfv(GL_LIGHT1 , GL_POSITION, light_pos1);
+    // glLightfv(GL_LIGHT1 , GL_DIFFUSE, diff1);
+    // glLightfv(GL_LIGHT1 , GL_AMBIENT, amb1);
+    // glLightfv(GL_LIGHT1 , GL_SPECULAR, spec1);
 
     
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_ambient);
@@ -189,8 +169,9 @@ void Tank::drawTank()
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
     glRotatef(-90, 1, 0, 0);
     glRotatef(90, 0, 0, 1);
+    
 
-    glPushMatrix();
+    
 
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
@@ -206,9 +187,8 @@ void Tank::drawTank()
         glVertex3f(vertices[i + 3][0], vertices[i + 3][1], vertices[i + 3][2]);
         glEnd();
     }
-
-    glPopMatrix();
     glDisable(GL_LIGHTING);
+    
     
 }
 
@@ -248,19 +228,8 @@ void Tank::move(){
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
     }
-    camera();
 }
-void Tank::camera()
-{
-    camPos[0] = ((sin(angle * TO_RADIANS) * truck) + pos[0]) + (sin((angle-90) * TO_RADIANS)*dolly);
-    camPos[1] = pos[1] + boom;
-    camPos[2] = ((cos(angle * TO_RADIANS) * truck) + pos[2]) + (cos((angle-90) * TO_RADIANS)*dolly);
 
-    camDir[0] = ((sin((angle-90) * TO_RADIANS)*dolly) + dir[0]);
-    camDir[1] = (dir[1] + boom) + tilt;
-    camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
-
-}
 void Tank::shoot()
 {
     
@@ -295,12 +264,11 @@ void Tank::drawProjectile()
         if (fabs(bullets[i][3]) >= 1)
         {
             glPushMatrix();
-                glTranslatef(bullets[i][0], 1, bullets[i][1]);
+                glTranslatef(bullets[i][0], 0.75, bullets[i][1]);
                 glColor3f(0.5, 0.5, 0.5);
                 glScalef(0.2, 0.2, 0.2);
                 glutSolidSphere(1, 10, 10);
             glPopMatrix();
-            glutPostRedisplay();
         }
     }
 }
@@ -317,4 +285,171 @@ void Tank::projectileUpdate()
             bullets[i][3] = 0;
         }
     }
+}
+
+
+Player::Player():Tank(){
+
+    m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
+    m_diffuse[0] = 0.1f; m_diffuse[1] = 0.35f; m_diffuse[2] = 0.1f; m_diffuse[3] = 1.0f;
+    m_specular[0] = 0.45f; m_specular[1] = 0.55f; m_specular[2] = 0.45f; m_specular[3] = 1.0f;
+    m_shininess = 32.0f;
+
+    loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
+
+    pos[0] = 0; pos[1] = 1; pos[2] = 0;
+
+    angle = 0;
+    dir[0] = sin(angle * TO_RADIANS) + pos[0];
+    dir[1] = 1;
+    dir[2] = cos(angle * TO_RADIANS) + pos[2];
+
+    truck = 0.0;
+    dolly = 0;
+    boom = 0.3;
+    tilt = -0.2;
+
+    updateCamera();
+}
+
+void Player::playerMove(){
+    move();
+    updateCamera();
+}
+
+void Player::draw(){
+
+    drawProjectile();
+    glPushMatrix();
+        glTranslatef(pos[0], -1, pos[2]);
+        glRotatef(angle, 0, 1, 0);
+        drawTank();
+    glPopMatrix();
+}
+
+void Player::drawHUD(){
+    /*  
+    HUD:
+    Lives
+    Points
+    Crosshair
+    MiniMap?
+    */
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    gluOrtho2D(0,glutGet(GLUT_WINDOW_WIDTH), 0, glutGet(GLUT_WINDOW_HEIGHT));
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    //Draw HUD STUFF
+
+    
+    
+    glBegin(GL_QUADS);
+
+        glColor3f(0.5, 0.5, 0.5);
+        glVertex2f(0,0);
+        glVertex2f(160,0);
+        glVertex2f(105,105);
+        glVertex2f(0,105);
+
+        glColor3f(1, 1, 1);
+        glVertex2f(5,5);
+        glVertex2f(150,5);
+        glVertex2f(100,100);
+        glVertex2f(5,100);
+        
+	glEnd();
+    
+    char *c;
+    char livesStr[] = "Lives: %d\0";
+    char scoreStr[] = "Score: %d\0";
+    char outputStr[50];
+    
+    drawText(8,55,livesStr,lives);
+
+    drawText(10,10,scoreStr,score);
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+
+}
+
+void Player::drawText(float x, float y, char *inString, int val){
+
+    char outputStr[50];
+
+    sprintf(outputStr, inString, score);
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(x, y, 0);
+    glLineWidth(3);
+    glScalef(0.2, 0.2, 0.2);
+
+    
+    for (char *c = outputStr; *c != '\0'; c++) {
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+	}
+    glPopMatrix();
+}
+
+void Player::updateCamera(){
+    camPos[0] = ((sin(angle * TO_RADIANS) * truck) + pos[0]) + (sin((angle-90) * TO_RADIANS)*dolly);
+    camPos[1] = pos[1] + boom;
+    camPos[2] = ((cos(angle * TO_RADIANS) * truck) + pos[2]) + (cos((angle-90) * TO_RADIANS)*dolly);
+
+    camDir[0] = ((sin((angle-90) * TO_RADIANS)*dolly) + dir[0]);
+    camDir[1] = (dir[1] + boom) + tilt;
+    camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
+}
+
+Enemy::Enemy(float x, float y, float z, float angle):Tank(){
+
+    m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
+    m_diffuse[0] = 0.5f; m_diffuse[1] = 0.0f; m_diffuse[2] = 0.0f; m_diffuse[3] = 1.0f;
+    m_specular[0] = 0.7f; m_specular[1] = 0.6f; m_specular[2] = 0.6f; m_specular[3] = 1.0f;
+    m_shininess = 32.0f;
+
+    loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
+
+    pos[0] = x; pos[1] = y; pos[2] = z;
+
+    this->angle = angle;
+    dir[0] = sin(angle * TO_RADIANS) + pos[0];
+    dir[1] = 1;
+    dir[2] = cos(angle * TO_RADIANS) + pos[2];
+
+}
+
+
+
+void Enemy::findPath(float x, float z){
+
+    
+
+}
+void Enemy::updatePosition(){
+
+}
+
+void Enemy::draw(){
+    
+    drawProjectile();
+
+    glPushMatrix();
+        glTranslatef(pos[0], pos[1], pos[2]);
+        glRotatef(angle, 0, 1, 0);
+        drawTank();
+    glPopMatrix();
 }

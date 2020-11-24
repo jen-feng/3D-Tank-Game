@@ -3,15 +3,12 @@
 GLdouble eye[] = {0, 1, 0};
 GLdouble lookAt[] = {0, 1, 0};
 GLdouble up[] = {0, 1, 0};
-Tank tank1 = Tank();
-//Tank tank2 = Tank();
+Player player = Player();
+Enemy enemy = Enemy(0,-1,10,90);
 world map = world();
 
-bool mb = false;
-int x, y, mx, my;
-
-const int width = 16 * 50;
-const int height = 9 * 50;
+const int width = 16 * 80;
+const int height = 9 * 80;
 
 void init(void)
 {
@@ -26,7 +23,7 @@ void init(void)
     glDepthFunc(GL_LEQUAL);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, 16.0 / 9.0, 0, 75);
+    gluPerspective(60, 16.0/9.0, 0.1, 75);
 }
 
 void display()
@@ -36,29 +33,24 @@ void display()
     glLoadIdentity();
 
     gluLookAt(
-        tank1.camPos[0], tank1.camPos[1], tank1.camPos[2],
-        tank1.camDir[0], tank1.camDir[1], tank1.camDir[2],
+        player.camPos[0], player.camPos[1], player.camPos[2],
+        player.camDir[0], player.camDir[1], player.camDir[2],
         up[0], up[1], up[2]);
     
 
     map.drawWorld();
 
-    tank1.drawProjectile();
-
-    tank1.drawTank();
-
-
-    // glPushMatrix();
-    // glTranslatef(10, -0.9, 10);
-    // tank2.drawTank();
-    // glPopMatrix();
+    enemy.draw();
+    player.draw();
+    player.drawHUD();
+    
 
     glFlush();
 }
 
 void timer(int x)
 {
-    tank1.projectileUpdate();
+    player.projectileUpdate();
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
@@ -68,22 +60,22 @@ void keyboard_up(unsigned char key, int x, int y)
     {
     case 'w':
     case 'W':
-        tank1.movement.Forward = false;
+        player.movement.Forward = false;
         break;
     case 'a':
     case 'A':
-        tank1.movement.rLeft = false;
+        player.movement.rLeft = false;
         break;
     case 's':
     case 'S':
-        tank1.movement.Backward = false;
+        player.movement.Backward = false;
         break;
     case 'd':
     case 'D':
-        tank1.movement.rRight = false;
+        player.movement.rRight = false;
         break;
     }
-    tank1.move();
+    player.playerMove();
     glutPostRedisplay();
 }
 
@@ -94,25 +86,25 @@ void keyboard(unsigned char key, int x, int y)
     {
     case 'w':
     case 'W':
-        tank1.movement.Forward = true;
+        player.movement.Forward = true;
         break;
     case 'a':
     case 'A':
-        tank1.movement.rLeft = true;
+        player.movement.rLeft = true;
         break;
     case 's':
     case 'S':
-        tank1.movement.Backward = true;
+        player.movement.Backward = true;
         break;
     case 'd':
     case 'D':
-        tank1.movement.rRight = true;
+        player.movement.rRight = true;
         break;
     case 32:
-        tank1.shoot();
+        player.shoot();
         break;
     }
-    tank1.move();
+    player.playerMove();
     glutPostRedisplay();
 }
 void special(int key, int x, int y)
@@ -120,34 +112,34 @@ void special(int key, int x, int y)
     if(key == GLUT_KEY_RIGHT)
     {
         if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            tank1.tilt += 0.1;
+            player.tilt += 0.1;
         else
-            tank1.dolly += 0.1;
+            player.dolly += 0.1;
     }
     if(key == GLUT_KEY_LEFT)
     {
         if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            tank1.tilt -= 0.1;
+            player.tilt -= 0.1;
         else
-            tank1.dolly -= 0.1;
+            player.dolly -= 0.1;
     }
     if(key == GLUT_KEY_UP)
     {
         if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            tank1.boom += 0.1;
+            player.boom += 0.1;
         else
-            tank1.truck += 0.1;
+            player.truck += 0.1;
         
     }
     if(key == GLUT_KEY_DOWN)
     {
         if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            tank1.boom -= 0.1;
+            player.boom -= 0.1;
         else
-            tank1.truck -= 0.1;
+            player.truck -= 0.1;
         
     }
-    tank1.camera();
+    player.updateCamera();
     glutPostRedisplay();
 }
 
@@ -156,7 +148,7 @@ void reshape(int w, int h)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, 16.0 / 9.0, 1, 75);
+    gluPerspective(60, 16.0/9.0, 0.1, 75);
     glMatrixMode(GL_MODELVIEW);
 }
 int main(int argc, char **argv)
@@ -182,6 +174,6 @@ int main(int argc, char **argv)
     // glutMotionFunc(motion);
     // glutPassiveMotionFunc(passiveMotion);
     glutMainLoop();
-    tank1.bullets.clear();
+    player.bullets.clear();
     return (0);
 }
