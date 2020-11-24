@@ -84,8 +84,7 @@ class Player: public Tank
     void updateCamera();
     void draw();
     void drawHUD();
-    
-
+    void drawText(float x, float y, char *outString);
 };
 
 class Enemy: public Tank

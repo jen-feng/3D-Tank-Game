@@ -370,36 +370,11 @@ void Player::drawHUD(){
     char livesStr[] = "Lives: %d\0";
     char scoreStr[] = "Score: %d\0";
     char outputStr[50];
-
-    sprintf(outputStr, livesStr, lives);
-
-    glPushMatrix();
-
-    glColor3f(1, 0, 0);
-    glTranslatef(8, 55, 0);
-    glLineWidth(3);
-    glScalef(0.2, 0.2, 0.2);
-
     
-    for (char *c=outputStr; *c != '\0'; c++) {
-		glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
-	}
-    glPopMatrix();
+    drawText(8,55,livesStr);
 
-    glPushMatrix();
+    drawText(10,10,scoreStr);
 
-    sprintf(outputStr, scoreStr, score);
-
-    glColor3f(1, 0, 0);
-    glTranslatef(10, 10, 0);
-    glLineWidth(3);
-    glScalef(0.2, 0.2, 0.2);
-
-    
-    for (char *c=outputStr; *c != '\0'; c++) {
-		glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
-	}
-    glPopMatrix();
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -407,6 +382,26 @@ void Player::drawHUD(){
     glPopMatrix();
 
 
+}
+
+void Player::drawText(float x, float y, char *inString){
+
+    char outputStr[50];
+
+    sprintf(outputStr, inString, score);
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(x, y, 0);
+    glLineWidth(3);
+    glScalef(0.2, 0.2, 0.2);
+
+    
+    for (char *c = outputStr; *c != '\0'; c++) {
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+	}
+    glPopMatrix();
 }
 
 void Player::updateCamera(){
