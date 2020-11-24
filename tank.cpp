@@ -371,9 +371,9 @@ void Player::drawHUD(){
     char scoreStr[] = "Score: %d\0";
     char outputStr[50];
     
-    drawText(8,55,livesStr);
+    drawText(8,55,livesStr,lives);
 
-    drawText(10,10,scoreStr);
+    drawText(10,10,scoreStr,score);
 
 
     glMatrixMode(GL_PROJECTION);
@@ -384,7 +384,7 @@ void Player::drawHUD(){
 
 }
 
-void Player::drawText(float x, float y, char *inString){
+void Player::drawText(float x, float y, char *inString, int val){
 
     char outputStr[50];
 
