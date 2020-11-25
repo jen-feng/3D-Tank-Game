@@ -21,6 +21,9 @@ void init(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0, 0, 0, 0);
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glMatrixMode(GL_PROJECTION);
@@ -125,14 +128,14 @@ void special(int key, int x, int y)
     if(key == GLUT_KEY_RIGHT)
     {
         if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            player.tilt += 0.1;
+            player.tilt += 0.01;
         else
             player.dolly += 0.1;
     }
     if(key == GLUT_KEY_LEFT)
     {
         if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            player.tilt -= 0.1;
+            player.tilt -= 0.01;
         else
             player.dolly -= 0.1;
     }

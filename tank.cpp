@@ -307,7 +307,7 @@ Player::Player():Tank(){
     truck = 0.0;
     dolly = 0;
     boom = 0.3;
-    tilt = -0.1;
+    tilt = -0.01;
 
     updateCamera();
 }
@@ -429,7 +429,7 @@ void Player::cameraReset(){
     truck = 0.0;
     dolly = 0;
     boom = 0.3;
-    tilt = -0.1;
+    tilt = -0.01;
 
     updateCamera();
 }
