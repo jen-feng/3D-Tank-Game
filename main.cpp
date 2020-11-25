@@ -10,6 +10,8 @@ world map = world();
 const int width = 16 * 80;
 const int height = 9 * 80;
 
+bool move = false;
+
 void init(void)
 {
 
@@ -51,6 +53,8 @@ void display()
 void timer(int x)
 {
     player.projectileUpdate();
+    if(move)
+        enemy.updatePosition();
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
@@ -102,6 +106,15 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 32:
         player.shoot();
+        break;
+    case 'r':
+    case 'R':
+        player.cameraReset();
+        break;
+    case 't':
+    case 'T':
+        move = !move;
+        enemy.findPath(-10,10);
         break;
     }
     player.playerMove();
