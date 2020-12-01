@@ -1,11 +1,13 @@
 #include "main.h"
+#include "image.h"
+#include "image.cpp"
 
 GLdouble eye[] = {0, 1, 0};
 GLdouble lookAt[] = {0, 1, 0};
 GLdouble up[] = {0, 1, 0};
 float light_pos[2][4] = {
     {-20, 20, 20, 1.0},
-    {20, 20, -20, 5.0},
+    {20, 20, 20, 1.0},
 };
 float amb[2][4] = {
     {0.1, 0.1, 0.1, 1},
@@ -19,7 +21,7 @@ float spec[2][4] = {
 Player player = Player();
 Enemy enemy = Enemy(0, -1, 10, 90);
 world map = world();
-
+Image texture;
 const int width = 16 * 80;
 const int height = 9 * 80;
 
@@ -41,6 +43,7 @@ void init(void)
 
 void display()
 {
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -171,9 +174,8 @@ void reshape(int w, int h)
 }
 int main(int argc, char **argv)
 {
-
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH );
 
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(width, height);
@@ -188,9 +190,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
-    // glutMouseFunc(mouse);
-    // glutMotionFunc(motion);
-    // glutPassiveMotionFunc(passiveMotion);
+    map.texture.texture();
     glutMainLoop();
     player.bullets.clear();
     return (0);

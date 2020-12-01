@@ -1,10 +1,12 @@
-
 #ifndef WORLD_H
 #define WORLD_H
+#include "image.h"
+#include "main.h"
 
 class world
 {
 public:
+    Image texture;
     int size;
     GLfloat m_ambient[4];
     GLfloat m_diffuse[4];
