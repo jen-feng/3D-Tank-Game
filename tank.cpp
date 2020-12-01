@@ -197,11 +197,11 @@ void Tank::move(){
 
     if(movement.Forward){
 
-        pos[0] += sin(angle * TO_RADIANS) * 0.2;
-        pos[2] += cos(angle * TO_RADIANS) * 0.2;
+        pos[0] += sin(angle * TO_RADIANS) * 0.5;
+        pos[2] += cos(angle * TO_RADIANS) * 0.5;
 
-        dir[0] += sin(angle * TO_RADIANS) * 0.2;
-        dir[2] += cos(angle * TO_RADIANS) * 0.2;
+        dir[0] += sin(angle * TO_RADIANS) * 0.5;
+        dir[2] += cos(angle * TO_RADIANS) * 0.5;
 
     }
     if(movement.rLeft){
@@ -214,11 +214,11 @@ void Tank::move(){
     }
     if(movement.Backward){
 
-        pos[0] -= sin(angle * TO_RADIANS) * 0.2;
-        pos[2] -= cos(angle * TO_RADIANS) * 0.2;
+        pos[0] -= sin(angle * TO_RADIANS) * 0.5;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.5;
 
-        dir[0] -= sin(angle * TO_RADIANS) * 0.2;
-        dir[2] -= cos(angle * TO_RADIANS) * 0.2;
+        dir[0] -= sin(angle * TO_RADIANS) * 0.5;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.5;
         
     }
     if(movement.rRight){
