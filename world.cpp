@@ -1,4 +1,6 @@
 #include "main.h"
+#include "world.h"
+#include "PPM.cc"
 
 world::world()
 {
@@ -6,34 +8,46 @@ world::world()
     m_diffuse[0] = 0.5f; m_diffuse[1] = 0.5f; m_diffuse[2] = 0.5f; m_diffuse[3] = 1.0f;
     m_specular[0] = 0.7f; m_specular[1] = 0.7f; m_specular[2] = 0.7f; m_specular[3] = 1.0f;
     m_shininess = 27.8974f;
-
+    
     size = 50;
-    loadObj("map2.obj", vertices, uvs, normals);
+    texture.load("wall.ppm");
+    loadObj("map3.obj", vertices, uvs, normals);
 }
 
 void world::drawWorld()
 {
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
+
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
-    
+    // texture.texture();
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
-
+        
         glBegin(GL_QUADS);
+        glTexCoord2f(uvs[i][0], uvs[i][1]);
         glNormal3f(normals[normalIndices[i] - 1][0], normals[normalIndices[i] - 1][1], normals[normalIndices[i] - 1][2]);
         glVertex3f(vertices[i][0], vertices[i][1], vertices[i][2]);
+        glTexCoord2f(uvs[i+1][0], uvs[i+1][1]);
         glNormal3f(normals[normalIndices[i + 1] - 1][0], normals[normalIndices[i + 1] - 1][1], normals[normalIndices[i + 1] - 1][2]);
         glVertex3f(vertices[i + 1][0], vertices[i + 1][1], vertices[i + 1][2]);
+        glTexCoord2f(uvs[i+2][0], uvs[i+2][1]);
         glNormal3f(normals[normalIndices[i + 2] - 1][0], normals[normalIndices[i + 2] - 1][1], normals[normalIndices[i + 2] - 1][2]);
         glVertex3f(vertices[i + 2][0], vertices[i + 2][1], vertices[i + 2][2]);
+        glTexCoord2f(uvs[i+3][0], uvs[i+3][1]);
         glNormal3f(normals[normalIndices[i + 3] - 1][0], normals[normalIndices[i + 3] - 1][1], normals[normalIndices[i + 3] - 1][2]);
         glVertex3f(vertices[i + 3][0], vertices[i + 3][1], vertices[i + 3][2]);
         glEnd();
     }
+    glPopMatrix();
+
 }
 
 void world::drawAxis()
@@ -121,9 +135,9 @@ bool world::loadObj(const char *fname,
         {
             std::vector<GLfloat> vt;
             fscanf(fp, "%f %f\n", &x, &y);
-            // vt.push_back(x);
-            // vt.push_back(y);
-            // temp_uvs.push_back(vt);
+            vt.push_back(x);
+            vt.push_back(y);
+            temp_uvs.push_back(vt);
         }
         else if (strcmp(lineHeader, "vn") == 0)
         {
@@ -151,10 +165,10 @@ bool world::loadObj(const char *fname,
                 vertexIndices.push_back(vertexIndex[1]);
                 vertexIndices.push_back(vertexIndex[2]);
                 vertexIndices.push_back(vertexIndex[3]);
-                // uvIndices.push_back(uvIndex[0]);
-                // uvIndices.push_back(uvIndex[1]);
-                // uvIndices.push_back(uvIndex[2]);
-                // uvIndices.push_back(uvIndex[3]);
+                uvIndices.push_back(uvIndex[0]);
+                uvIndices.push_back(uvIndex[1]);
+                uvIndices.push_back(uvIndex[2]);
+                uvIndices.push_back(uvIndex[3]);
                 normalIndices.push_back(normalIndex[0]);
                 normalIndices.push_back(normalIndex[1]);
                 normalIndices.push_back(normalIndex[2]);
@@ -168,17 +182,17 @@ bool world::loadObj(const char *fname,
 
         // Get the indices of its attributes
         unsigned int vertexIndex = vertexIndices[i];
-        // unsigned int uvIndex = uvIndices[i];
+        unsigned int uvIndex = uvIndices[i];
         unsigned int normalIndex = normalIndices[i];
 
         // Get the attributes thanks to the index
         std::vector<GLfloat> vertex = temp_vertices[vertexIndex - 1];
-        // std::vector<GLfloat> uv = temp_uvs[uvIndex - 1];
+        std::vector<GLfloat> uv = temp_uvs[uvIndex - 1];
         std::vector<GLfloat> normal = temp_normals[normalIndex - 1];
 
         // Put the attributes in buffers
         out_vertices.push_back(vertex);
-        // out_uvs.push_back(uv);
+        out_uvs.push_back(uv);
         out_normals.push_back(normal);
     }
     fclose(fp);
