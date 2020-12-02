@@ -104,30 +104,46 @@ void keyboard_up(unsigned char key, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
-
-    switch (key)
-    {
-    case 'w':
-    case 'W':
-        player.movement.Forward = true;
-        break;
-    case 'a':
-    case 'A':
-        player.movement.rLeft = true;
-        break;
-    case 's':
-    case 'S':
-        player.movement.Backward = true;
-        break;
-    case 'd':
-    case 'D':
-        player.movement.rRight = true;
-        break;
-    case 32:
-        player.shoot();
-        break;
+    bool move = true;
+    for(int i =0; i< map.boundaries.size();i++){
+        float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][0]+1);
+        float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][2]+1);
+        float dist = sqrt(dx*dx+dy*dy);
+        if(dist < 1 + 0.8)
+        {
+            move = false;
+            player.pos[0] -= sin(player.angle * TO_RADIANS);
+            player.pos[2] -= cos(player.angle * TO_RADIANS); 
+            break;
+        }
     }
-    player.playerMove();
+    if (move)
+    {
+        switch (key)
+        {
+        case 'w':
+        case 'W':
+            player.movement.Forward = true;
+            break;
+        case 'a':
+        case 'A':
+            player.movement.rLeft = true;
+            break;
+        case 's':
+        case 'S':
+            player.movement.Backward = true;
+            break;
+        case 'd':
+        case 'D':
+            player.movement.rRight = true;
+            break;
+        case 32:
+            player.shoot();
+            break;
+        }
+        player.playerMove();
+    }
+
     glutPostRedisplay();
 }
 void special(int key, int x, int y)

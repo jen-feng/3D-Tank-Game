@@ -35,7 +35,7 @@ public:
     std::vector<std::vector<GLfloat> > vertices;
     std::vector<std::vector<GLfloat> > uvs;
     std::vector<std::vector<GLfloat> > normals;
-    std::vector<char[255]> materials; // Name
+    std::vector<float> boundaries;
 
     struct Motion
     {

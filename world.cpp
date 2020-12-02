@@ -11,7 +11,7 @@ world::world()
     
     size = 50;
     texture.load("wall.ppm");
-    loadObj("map3.obj", vertices, uvs, normals);
+    loadObj("map2.obj", vertices, uvs, normals);
 }
 
 void world::drawWorld()
@@ -94,9 +94,9 @@ void world::drawAxis()
 }
 
 bool world::loadObj(const char *fname,
-                    std::vector<std::vector<GLfloat>> &out_vertices,
-                    std::vector<std::vector<GLfloat>> &out_uvs,
-                    std::vector<std::vector<GLfloat>> &out_normals)
+                    std::vector<std::vector<GLfloat> > &out_vertices,
+                    std::vector<std::vector<GLfloat> > &out_uvs,
+                    std::vector<std::vector<GLfloat> > &out_normals)
 {
     printf("Loading OBJ file %s...\n", fname);
     std::vector<std::vector<GLfloat>> temp_vertices;
@@ -106,6 +106,10 @@ bool world::loadObj(const char *fname,
     int read;
     GLfloat x, y, z;
     char ch;
+    float minX = 10000;
+    float minZ = 10000;
+    float maxX = -10000;
+    float maxZ = -10000;
     fp = fopen(fname, "r");
     if (!fp)
     {
@@ -125,6 +129,18 @@ bool world::loadObj(const char *fname,
         {
             std::vector<GLfloat> v;
             fscanf(fp, "%f %f %f\n", &x, &y, &z);
+            if(x < minX){
+                minX = x;
+            }
+            else if(x > maxX){
+                maxX = x;
+            }
+            if(y < minZ){
+                minZ = z;
+            }
+            else if(y > maxZ){
+                maxZ = z;
+            }
             v.push_back(x);
             v.push_back(y);
             v.push_back(z);
@@ -174,6 +190,16 @@ bool world::loadObj(const char *fname,
                 normalIndices.push_back(normalIndex[2]);
                 normalIndices.push_back(normalIndex[3]);
             }
+        }
+        else if(strcmp(lineHeader, "o") == 0)
+        {
+            std::vector<GLfloat> b;
+            b.push_back(minX);b.push_back(maxX);b.push_back(minZ);b.push_back(maxZ);
+            boundaries.push_back(b);
+            minX = 10000;
+            minZ = 10000;
+            maxX = -10000;
+            maxZ = -10000;
         }
     }
 
