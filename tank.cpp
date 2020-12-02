@@ -49,6 +49,10 @@ bool Tank::loadObj(const char *fname,
     int read;
     GLfloat x, y, z;
     char ch;
+    float minX = 10000;
+    float minZ = 10000;
+    float maxX = -10000;
+    float maxZ = -10000;
     fp = fopen(fname, "r");
     if (!fp)
     {
@@ -68,6 +72,18 @@ bool Tank::loadObj(const char *fname,
         {
             std::vector<GLfloat> v;
             fscanf(fp, "%f %f %f\n", &x, &y, &z);
+            if(x < minX){
+                minX = x;
+            }
+            else if(x > maxX){
+                maxX = x;
+            }
+            if(y < minZ){
+                minZ = y;
+            }
+            else if(y > maxZ){
+                maxZ = y;
+            }
             v.push_back(x);
             v.push_back(y);
             v.push_back(z);
@@ -119,6 +135,10 @@ bool Tank::loadObj(const char *fname,
             }
         }
     }
+    boundaries.push_back(minX);
+    boundaries.push_back(maxX);
+    boundaries.push_back(minZ);
+    boundaries.push_back(maxZ);
 
     for (unsigned int i = 0; i < vertexIndices.size(); i++)
     {
@@ -162,16 +182,13 @@ void Tank::drawTank()
     // glLightfv(GL_LIGHT1 , GL_AMBIENT, amb1);
     // glLightfv(GL_LIGHT1 , GL_SPECULAR, spec1);
 
-    
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
     glRotatef(-90, 1, 0, 0);
     glRotatef(90, 0, 0, 1);
-    
 
-    
 
     for (int i = 0; i < vertexIndices.size(); i = i + 4)
     {
@@ -196,7 +213,7 @@ void Tank::drawTank()
 void Tank::move(){
 
     if(movement.Forward){
-
+        
         pos[0] += sin(angle * TO_RADIANS) * 0.5;
         pos[2] += cos(angle * TO_RADIANS) * 0.5;
 
@@ -209,8 +226,7 @@ void Tank::move(){
         angle++;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
-        dir[2] = cos(angle * TO_RADIANS) + pos[2];      
-        
+        dir[2] = cos(angle * TO_RADIANS) + pos[2];
     }
     if(movement.Backward){
 
@@ -219,7 +235,6 @@ void Tank::move(){
 
         dir[0] -= sin(angle * TO_RADIANS) * 0.5;
         dir[2] -= cos(angle * TO_RADIANS) * 0.5;
-        
     }
     if(movement.rRight){
 
@@ -227,7 +242,14 @@ void Tank::move(){
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
+
+        // boundaries[0] = sin(angle * TO_RADIANS) + pos[0] - dx / 2;
+        // boundaries[1] = sin(angle * TO_RADIANS) + pos[0] + dx / 2;
+        // boundaries[2] = cos(angle * TO_RADIANS) + pos[2] - dz / 2;
+        // boundaries[3] = cos(angle * TO_RADIANS) + pos[2] + dz / 2;
     }
+
+
 }
 
 void Tank::shoot()
@@ -264,7 +286,7 @@ void Tank::drawProjectile()
         if (fabs(bullets[i][3]) >= 1)
         {
             glPushMatrix();
-                glTranslatef(bullets[i][0], 0.75, bullets[i][1]);
+                glTranslatef(bullets[i][0]+sin(angle * TO_RADIANS)*1.5, 0.75, bullets[i][1]+cos(angle * TO_RADIANS)*1.5);
                 glColor3f(0.5, 0.5, 0.5);
                 glScalef(0.2, 0.2, 0.2);
                 glutSolidSphere(1, 10, 10);
@@ -277,8 +299,8 @@ void Tank::projectileUpdate()
 {
     for (int i = 0; i < bullets.size(); i++)
     {
-        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS) * 3;
-        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS) * 3;
+        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS) * 0.2;
+        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS) * 0.2;
         float len = sqrt((bullets[i][0] * bullets[i][0]) + (bullets[i][1] * bullets[i][1]));
         if (len > 60)
         {
@@ -295,7 +317,8 @@ Player::Player():Tank(){
     m_specular[0] = 0.45f; m_specular[1] = 0.55f; m_specular[2] = 0.45f; m_specular[3] = 1.0f;
     m_shininess = 32.0f;
 
-    loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
+    // loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
+    loadObj("small.obj", vertices, uvs, normals);
 
     pos[0] = 0; pos[1] = 1; pos[2] = 0;
 
