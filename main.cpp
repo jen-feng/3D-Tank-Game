@@ -80,8 +80,18 @@ void display()
 void timer(int x)
 {
     player.projectileUpdate();
-    if(move)
-        enemy.updatePosition();
+    enemy.projectileUpdate();
+    for (int i = 0; i < player.bullets.size(); i++)
+    {
+        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 1 && player.bullets[i][3] > 0)
+        {
+            player.score += 1;
+            player.bullets[i][3] = 0;
+        }
+    }
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
