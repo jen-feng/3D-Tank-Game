@@ -3,8 +3,21 @@
 GLdouble eye[] = {0, 1, 0};
 GLdouble lookAt[] = {0, 1, 0};
 GLdouble up[] = {0, 1, 0};
+float light_pos[2][4] = {
+    {-20, 20, 20, 1.0},
+    {20, 20, -20, 5.0},
+};
+float amb[2][4] = {
+    {0.1, 0.1, 0.1, 1},
+    {1, 1, 1, 1}};
+float diff[2][4] = {
+    {0.9, 0.9, 0.9, 1},
+    {0, 0, 0, 1}};
+float spec[2][4] = {
+    {0.5, 0.5, 0.5, 1},
+    {1, 1, 1, 1}};
 Player player = Player();
-Enemy enemy = Enemy(0,-1,10,90);
+Enemy enemy = Enemy(0, -1, 10, 90);
 world map = world();
 
 const int width = 16 * 80;
@@ -28,7 +41,7 @@ void init(void)
     glDepthFunc(GL_LEQUAL);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, 16.0/9.0, 0.1, 75);
+    gluPerspective(60, 16.0 / 9.0, 0.1, 75);
 }
 
 void display()
@@ -36,19 +49,26 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        glLightfv(GL_LIGHT0 + i, GL_POSITION, light_pos[i]);
+        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diff[i]);
+        glLightfv(GL_LIGHT0 + i, GL_AMBIENT, amb[i]);
+        glLightfv(GL_LIGHT0 + i, GL_SPECULAR, spec[i]);
+    }
     gluLookAt(
         player.camPos[0], player.camPos[1], player.camPos[2],
         player.camDir[0], player.camDir[1], player.camDir[2],
         up[0], up[1], up[2]);
-    
 
     map.drawWorld();
 
     enemy.draw();
     player.draw();
     player.drawHUD();
-    
 
     glFlush();
 }
@@ -125,35 +145,33 @@ void keyboard(unsigned char key, int x, int y)
 }
 void special(int key, int x, int y)
 {
-    if(key == GLUT_KEY_RIGHT)
+    if (key == GLUT_KEY_RIGHT)
     {
-        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            player.tilt += 0.01;
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+            player.tilt += 0.1;
         else
             player.dolly += 0.1;
     }
-    if(key == GLUT_KEY_LEFT)
+    if (key == GLUT_KEY_LEFT)
     {
-        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
-            player.tilt -= 0.01;
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+            player.tilt -= 0.1;
         else
             player.dolly -= 0.1;
     }
-    if(key == GLUT_KEY_UP)
+    if (key == GLUT_KEY_UP)
     {
-        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
             player.boom += 0.1;
         else
             player.truck += 0.1;
-        
     }
-    if(key == GLUT_KEY_DOWN)
+    if (key == GLUT_KEY_DOWN)
     {
-        if(glutGetModifiers()== GLUT_ACTIVE_SHIFT)
+        if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
             player.boom -= 0.1;
         else
             player.truck -= 0.1;
-        
     }
     player.updateCamera();
     glutPostRedisplay();
@@ -164,7 +182,7 @@ void reshape(int w, int h)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, 16.0/9.0, 0.1, 75);
+    gluPerspective(60, 16.0 / 9.0, 0.1, 75);
     glMatrixMode(GL_MODELVIEW);
 }
 int main(int argc, char **argv)
