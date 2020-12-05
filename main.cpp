@@ -70,6 +70,7 @@ void display()
     map.drawWorld();
 
     enemy.draw();
+    enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
 
@@ -111,24 +112,21 @@ void keyboard_up(unsigned char key, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
-    bool move = true;
     for(int i =0; i< map.boundaries.size();i++){
         float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][0]+1);
         float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][2]+1);
         float dist = sqrt(dx*dx+dy*dy);
         if(dist < 1 + 0.8)
         {
-            move = false;
             player.pos[0] -= sin(player.angle * TO_RADIANS);
             player.pos[2] -= cos(player.angle * TO_RADIANS); 
             break;
         }
     }
-        switch (key)
-        {
-    if (move)
-    {
 
+
+    switch (key)
+    {
     case 'w':
     case 'W':
         player.movement.Forward = true;
@@ -151,11 +149,6 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
     case 'R':
         player.cameraReset();
-        break;
-    case 't':
-    case 'T':
-        move = !move;
-        enemy.findPath(-10,10);
         break;
     }
         // switch (key)
@@ -181,7 +174,8 @@ void keyboard(unsigned char key, int x, int y)
         //     break;
         // }
         // player.playerMove();
-    }
+
+    player.playerMove();
 
     glutPostRedisplay();
 }

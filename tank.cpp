@@ -481,29 +481,30 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 }
 
 
-
-void Enemy::findPath(float x, float z){
-    
-    float path[3] = {0};
-    float x1,x2,z1,z2,vec1,vec2,dist;
-
-    nextPos[0] = x;
-    nextPos[2] = z;
-
-    x1 = x - pos[0];
-    z1 = z - pos[2];
-    x2 = dir[0] - pos[0];
-    z2 = dir[2] - pos[2];
-
-    dist = sqrt((x1*x1)+(z1*z1));
-
-    vec1 = (x1*z2)-(z1*x2);
-    vec2 = (x1*x2)+(z1*z2);
-
-    ang = (atan2(vec1,vec2))*TO_DEG;
-
-    ang = ang + angle;
+void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
+    pos[0] += sin(angle * TO_RADIANS)*0.1;
+    pos[2] += cos(angle * TO_RADIANS)*0.1;
+    for (int i = 0; i < boundaries.size(); i++)
+    {
+        float dx = (pos[0] + sin(angle * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
+        float dy = (pos[2] + cos(angle * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 0.8)
+        {
+            pos[0] -= sin(angle * TO_RADIANS);
+            pos[2] -= cos(angle * TO_RADIANS);
+            int n = rand() % 4;
+            if(n == 0) angle += 90;
+            if(n == 1) angle -= 90;
+            if(n == 2) angle += 180;
+            if(n == 3) angle -= 180;
+            dir[0] = sin(angle * TO_RADIANS) + pos[0];
+            dir[2] = cos(angle * TO_RADIANS) + pos[2];
+            break;
+        }
+    }
 }
+
 void Enemy::updatePosition(){
     rotate = true;
 
