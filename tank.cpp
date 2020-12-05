@@ -299,8 +299,8 @@ void Tank::projectileUpdate()
 {
     for (int i = 0; i < bullets.size(); i++)
     {
-        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS) * 0.2;
-        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS) * 0.2;
+        bullets[i][0] += sin(bullets[i][2] * TO_RADIANS) * 0.5;
+        bullets[i][1] += cos(bullets[i][2] * TO_RADIANS) * 0.5;
         float len = sqrt((bullets[i][0] * bullets[i][0]) + (bullets[i][1] * bullets[i][1]));
         if (len > 60)
         {
@@ -320,7 +320,7 @@ Player::Player():Tank(){
     // loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
     loadObj("small.obj", vertices, uvs, normals);
 
-    pos[0] = 0; pos[1] = 1; pos[2] = 0;
+    pos[0] = 2; pos[1] = 1; pos[2] = 2;
 
     angle = 0;
     dir[0] = sin(angle * TO_RADIANS) + pos[0];
@@ -389,10 +389,9 @@ void Player::drawHUD(){
         
 	glEnd();
     
-    char *c;
     char livesStr[] = "Lives: %d\0";
     char scoreStr[] = "Score: %d\0";
-    char outputStr[50];
+
     
     drawText(8,55,livesStr,lives);
 
@@ -465,20 +464,41 @@ void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
         float dx = (pos[0] + sin(angle * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
         float dy = (pos[2] + cos(angle * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
         float dist = sqrt(dx * dx + dy * dy);
+        float ddx = (pos[0] + sin((angle+90) * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
+        float ddy = (pos[2] + cos((angle+90) * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float dist2 = sqrt(ddx * ddx + ddy * ddy);
+        float dddx = (pos[0] + sin((angle-90) * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
+        float dddy = (pos[2] + cos((angle-90) * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float dist3 = sqrt(dddx * dddx + dddy * dddy);
+        int n = rand() % 12;
+        int n1 = rand() % 1000;
         if (dist < 1 + 0.8)
         {
             pos[0] -= sin(angle * TO_RADIANS);
             pos[2] -= cos(angle * TO_RADIANS);
-            int n = rand() % 4;
             if(n == 0) angle += 90;
-            if(n == 1) angle -= 90;
             if(n == 2) angle += 180;
-            if(n == 3) angle -= 180;
+            if(n == 3) angle -= 90;
+            if(n == 4) angle += 45;
+            if(n == 6) angle += 90;
+            if(n == 7) angle -= 45;
+            if(n == 8) angle += 180;
+            if(n == 9) angle -= 90;
+            if(n == 10) angle += 45;
+            if(n == 1) angle += 90;
+            dir[0] = sin(angle * TO_RADIANS) + pos[0];
+            dir[2] = cos(angle * TO_RADIANS) + pos[2];
+            break;
+        }
+        if (dist2 > 3 && dist2 < 6 && n1 == 50 || (dist3 > 3 && dist3 < 6 && n1 == 150)) {
+            angle += 90;
             dir[0] = sin(angle * TO_RADIANS) + pos[0];
             dir[2] = cos(angle * TO_RADIANS) + pos[2];
             break;
         }
     }
+    int n3 = rand() % 100;
+    if (n3 == 56 || n3 == 78) shoot();
 }
 void Enemy::updatePosition(){
 
@@ -491,6 +511,10 @@ void Enemy::draw(){
     glPushMatrix();
         glTranslatef(pos[0], pos[1], pos[2]);
         glRotatef(angle, 0, 1, 0);
+        glPushMatrix();
+        glTranslatef(0, 5,0);
+        glutSolidCube(1);
+        glPopMatrix();
         drawTank();
     glPopMatrix();
 }
