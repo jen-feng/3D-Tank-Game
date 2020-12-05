@@ -457,10 +457,28 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 
 
 
-void Enemy::findPath(float x, float z){
-
-    
-
+void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
+    pos[0] += sin(angle * TO_RADIANS)*0.1;
+    pos[2] += cos(angle * TO_RADIANS)*0.1;
+    for (int i = 0; i < boundaries.size(); i++)
+    {
+        float dx = (pos[0] + sin(angle * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
+        float dy = (pos[2] + cos(angle * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 0.8)
+        {
+            pos[0] -= sin(angle * TO_RADIANS);
+            pos[2] -= cos(angle * TO_RADIANS);
+            int n = rand() % 4;
+            if(n == 0) angle += 90;
+            if(n == 1) angle -= 90;
+            if(n == 2) angle += 180;
+            if(n == 3) angle -= 180;
+            dir[0] = sin(angle * TO_RADIANS) + pos[0];
+            dir[2] = cos(angle * TO_RADIANS) + pos[2];
+            break;
+        }
+    }
 }
 void Enemy::updatePosition(){
 

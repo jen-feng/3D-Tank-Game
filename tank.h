@@ -93,7 +93,7 @@ class Enemy: public Tank
 
     Enemy(float x, float y, float z, float ang);
 
-    void findPath(float x, float z);
+    void findPath(std::vector<std::vector<GLfloat> > boundaries);
     void updatePosition();
 
     void draw();
