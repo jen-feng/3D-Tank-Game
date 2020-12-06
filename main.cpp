@@ -70,6 +70,7 @@ void display()
     map.drawWorld();
 
     enemy.draw();
+    enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
 
@@ -79,8 +80,18 @@ void display()
 void timer(int x)
 {
     player.projectileUpdate();
-    if(move)
-        enemy.updatePosition();
+    enemy.projectileUpdate();
+    for (int i = 0; i < player.bullets.size(); i++)
+    {
+        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 1 && player.bullets[i][3] > 0)
+        {
+            player.score += 1;
+            player.bullets[i][3] = 0;
+        }
+    }
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
@@ -111,6 +122,18 @@ void keyboard_up(unsigned char key, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
+    for(int i =0; i< map.boundaries.size();i++){
+        float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][0]+1);
+        float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][2]+1);
+        float dist = sqrt(dx*dx+dy*dy);
+        if(dist < 1 + 0.8)
+        {
+            player.pos[0] -= sin(player.angle * TO_RADIANS);
+            player.pos[2] -= cos(player.angle * TO_RADIANS); 
+            break;
+        }
+    }
+
 
     switch (key)
     {
@@ -137,13 +160,33 @@ void keyboard(unsigned char key, int x, int y)
     case 'R':
         player.cameraReset();
         break;
-    case 't':
-    case 'T':
-        move = !move;
-        enemy.findPath(-10,10);
-        break;
     }
+        // switch (key)
+        // {
+        // case 'w':
+        // case 'W':
+        //     player.movement.Forward = true;
+        //     break;
+        // case 'a':
+        // case 'A':
+        //     player.movement.rLeft = true;
+        //     break;
+        // case 's':
+        // case 'S':
+        //     player.movement.Backward = true;
+        //     break;
+        // case 'd':
+        // case 'D':
+        //     player.movement.rRight = true;
+        //     break;
+        // case 32:
+        //     player.shoot();
+        //     break;
+        // }
+        // player.playerMove();
+
     player.playerMove();
+
     glutPostRedisplay();
 }
 void special(int key, int x, int y)
