@@ -307,7 +307,7 @@ Player::Player():Tank(){
     truck = 0.0;
     dolly = 0;
     boom = 0.3;
-    tilt = -0.2;
+    tilt = -0.01;
 
     updateCamera();
 }
@@ -336,11 +336,14 @@ void Player::drawHUD(){
     MiniMap?
     */
 
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
 
-    gluOrtho2D(0,glutGet(GLUT_WINDOW_WIDTH), 0, glutGet(GLUT_WINDOW_HEIGHT));
+    gluOrtho2D(0,w, 0, h);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -348,10 +351,19 @@ void Player::drawHUD(){
 
     //Draw HUD STUFF
 
+    // > +x
+    // ^ +y
     
-    
-    glBegin(GL_QUADS);
+    glBegin(GL_LINES);
+        glColor3f(0, 1, 0);
+        glScalef(0.2, 0.2, 0.2);
+        glVertex2f((w/2)-25,(h/2));
+        glVertex2f((w/2)+25,(h/2));
+        glVertex2f((w/2),(h/2)+25);
+        glVertex2f((w/2),(h/2)-25);
+	glEnd();
 
+    glBegin(GL_QUADS);
         glColor3f(0.5, 0.5, 0.5);
         glVertex2f(0,0);
         glVertex2f(160,0);
@@ -363,7 +375,6 @@ void Player::drawHUD(){
         glVertex2f(150,5);
         glVertex2f(100,100);
         glVertex2f(5,100);
-        
 	glEnd();
     
     char *c;
@@ -388,7 +399,7 @@ void Player::drawText(float x, float y, char *inString, int val){
 
     char outputStr[50];
 
-    sprintf(outputStr, inString, score);
+    sprintf(outputStr, inString, val);
 
     glPushMatrix();
 
@@ -414,6 +425,15 @@ void Player::updateCamera(){
     camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
 }
 
+void Player::cameraReset(){
+    truck = 0.0;
+    dolly = 0;
+    boom = 0.3;
+    tilt = -0.01;
+
+    updateCamera();
+}
+
 Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 
     m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
@@ -426,20 +446,70 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
     pos[0] = x; pos[1] = y; pos[2] = z;
 
     this->angle = angle;
-    dir[0] = sin(angle * TO_RADIANS) + pos[0];
+    dir[0] = sin(this->angle * TO_RADIANS) + pos[0];
     dir[1] = 1;
-    dir[2] = cos(angle * TO_RADIANS) + pos[2];
+    dir[2] = cos(this->angle * TO_RADIANS) + pos[2];
+
+    nextPos[0] = 0; nextPos[1] = 0; nextPos[2] = 0;
+
+    ang = 0;
+    dist = 0;
 
 }
 
 
 
 void Enemy::findPath(float x, float z){
-
     
+    float path[3] = {0};
+    float x1,x2,z1,z2,vec1,vec2,dist;
 
+    nextPos[0] = x;
+    nextPos[2] = z;
+
+    x1 = x - pos[0];
+    z1 = z - pos[2];
+    x2 = dir[0] - pos[0];
+    z2 = dir[2] - pos[2];
+
+    dist = sqrt((x1*x1)+(z1*z1));
+
+    vec1 = (x1*z2)-(z1*x2);
+    vec2 = (x1*x2)+(z1*z2);
+
+    ang = (atan2(vec1,vec2))*TO_DEG;
+
+    ang = ang + angle;
 }
 void Enemy::updatePosition(){
+    rotate = true;
+
+    if(rotate){
+        if(angle > ang){
+            movement.rRight = true;
+        }
+        else
+            movement.rLeft = true;
+        
+
+        if(ang == angle){
+            
+            rotate = false;
+            movement.rRight = false;
+            movement.rLeft = false;
+        }
+    }
+    if(rotate == false){
+
+        if((pos[0] == nextPos[0]) && (pos[2] == nextPos[2])){
+            movement.Forward = false;
+        }
+        else
+            movement.Forward = true;
+
+    }
+
+    move();
 
 }
 

@@ -82,6 +82,7 @@ class Player: public Tank
 
     void playerMove();
     void updateCamera();
+    void cameraReset();
     void draw();
     void drawHUD();
     void drawText(float x, float y, char *inString, int val);
@@ -90,6 +91,13 @@ class Player: public Tank
 class Enemy: public Tank
 {
     public:
+
+    float nextX;
+    float nextY;
+    float nextPos[3];
+    bool rotate;
+    float dist;
+    float ang;
 
     Enemy(float x, float y, float z, float ang);
 

@@ -25,6 +25,8 @@ Image texture;
 const int width = 16 * 80;
 const int height = 9 * 80;
 
+bool move = false;
+
 void init(void)
 {
 
@@ -33,6 +35,9 @@ void init(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0, 0, 0, 0);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -74,6 +79,8 @@ void display()
 void timer(int x)
 {
     player.projectileUpdate();
+    if(move)
+        enemy.updatePosition();
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
@@ -125,6 +132,15 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 32:
         player.shoot();
+        break;
+    case 'r':
+    case 'R':
+        player.cameraReset();
+        break;
+    case 't':
+    case 'T':
+        move = !move;
+        enemy.findPath(-10,10);
         break;
     }
     player.playerMove();

@@ -20,7 +20,8 @@
 #include "tank.h"
 #include "world.h"
 
-#define FPS 60
+#define FPS 30
 #define TO_RADIANS 3.14159265/180.0
+#define TO_DEG 180.0/3.14159265
 
 #endif
