@@ -24,8 +24,14 @@ world map = world();
 Image texture;
 const int width = 16 * 80;
 const int height = 9 * 80;
+const int miniWidth = 300;
+const int miniHeight = 300;
+GLint mainWindow, subWindow;
+unsigned int fbo;
 
 bool move = false;
+
+void minimap();
 
 void init(void)
 {
@@ -48,7 +54,7 @@ void init(void)
 
 void display()
 {
-
+    glutSetWindow(mainWindow);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -73,8 +79,26 @@ void display()
     enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
-
+    minimap();
     glFlush();
+}
+
+void minimap(){
+    glutSetWindow(subWindow);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+
+    gluLookAt(
+        player.pos[0], 30, player.pos[2],
+        player.pos[0], player.pos[1], player.pos[2],
+        1, 0, 0);
+    
+
+    map.drawWorld();
+    enemy.draw();
+    player.draw();
 }
 
 void timer(int x)
@@ -238,19 +262,30 @@ int main(int argc, char **argv)
 
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(width, height);
-
-    glutCreateWindow("Tank Game");
+    mainWindow = glutCreateWindow("Tank Game");
+    
+    glutDisplayFunc(display);
 
     glutTimerFunc(1000 / FPS, timer, 0);
 
     init();
-    glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
+    
+    
+    
+    glutInitWindowSize(miniWidth, miniHeight);
+    glutInitWindowPosition((width-miniWidth), (width-miniHeight));
+    subWindow = glutCreateWindow("MiniMap");
+    
+    glutDisplayFunc(minimap);
+    glutReshapeFunc(reshape);
+
     map.texture.texture();
-    glutMainLoop();
     player.bullets.clear();
+
+    glutMainLoop();
     return (0);
 }
