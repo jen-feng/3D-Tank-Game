@@ -99,9 +99,9 @@ bool world::loadObj(const char *fname,
                     std::vector<std::vector<GLfloat> > &out_normals)
 {
     printf("Loading OBJ file %s...\n", fname);
-    std::vector<std::vector<GLfloat>> temp_vertices;
-    std::vector<std::vector<GLfloat>> temp_uvs;
-    std::vector<std::vector<GLfloat>> temp_normals;
+    std::vector<std::vector<GLfloat> > temp_vertices;
+    std::vector<std::vector<GLfloat> > temp_uvs;
+    std::vector<std::vector<GLfloat> > temp_normals;
     FILE *fp;
     int read;
     GLfloat x, y, z;
