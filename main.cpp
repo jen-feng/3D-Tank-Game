@@ -275,9 +275,8 @@ int main(int argc, char **argv)
     glutSpecialFunc(special);
     
     
-    
-    glutInitWindowSize(miniWidth, miniHeight);
     glutInitWindowPosition((width-miniWidth), (width-miniHeight));
+    glutInitWindowSize(miniWidth, miniHeight);
     subWindow = glutCreateWindow("MiniMap");
     
     glutDisplayFunc(minimap);
