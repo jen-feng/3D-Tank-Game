@@ -33,16 +33,16 @@ void world::drawWorld()
         
         glBegin(GL_QUADS);
         glTexCoord2f(uvs[i][0], uvs[i][1]);
-        glNormal3f(normals[normalIndices[i] - 1][0], normals[normalIndices[i] - 1][1], normals[normalIndices[i] - 1][2]);
+        glNormal3f(normals[i][0], normals[i][1], normals[i][2]);
         glVertex3f(vertices[i][0], vertices[i][1], vertices[i][2]);
         glTexCoord2f(uvs[i+1][0], uvs[i+1][1]);
-        glNormal3f(normals[normalIndices[i + 1] - 1][0], normals[normalIndices[i + 1] - 1][1], normals[normalIndices[i + 1] - 1][2]);
+        glNormal3f(normals[i + 1][0], normals[i + 1][1], normals[i + 1][2]);
         glVertex3f(vertices[i + 1][0], vertices[i + 1][1], vertices[i + 1][2]);
         glTexCoord2f(uvs[i+2][0], uvs[i+2][1]);
-        glNormal3f(normals[normalIndices[i + 2] - 1][0], normals[normalIndices[i + 2] - 1][1], normals[normalIndices[i + 2] - 1][2]);
+        glNormal3f(normals[i + 2][0], normals[i + 2][1], normals[i + 2][2]);
         glVertex3f(vertices[i + 2][0], vertices[i + 2][1], vertices[i + 2][2]);
         glTexCoord2f(uvs[i+3][0], uvs[i+3][1]);
-        glNormal3f(normals[normalIndices[i + 3] - 1][0], normals[normalIndices[i + 3] - 1][1], normals[normalIndices[i + 3] - 1][2]);
+        glNormal3f(normals[i + 3][0], normals[i + 3][1], normals[i + 3][2]);
         glVertex3f(vertices[i + 3][0], vertices[i + 3][1], vertices[i + 3][2]);
         glEnd();
     }
