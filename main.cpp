@@ -185,30 +185,6 @@ void keyboard(unsigned char key, int x, int y)
         player.cameraReset();
         break;
     }
-        // switch (key)
-        // {
-        // case 'w':
-        // case 'W':
-        //     player.movement.Forward = true;
-        //     break;
-        // case 'a':
-        // case 'A':
-        //     player.movement.rLeft = true;
-        //     break;
-        // case 's':
-        // case 'S':
-        //     player.movement.Backward = true;
-        //     break;
-        // case 'd':
-        // case 'D':
-        //     player.movement.rRight = true;
-        //     break;
-        // case 32:
-        //     player.shoot();
-        //     break;
-        // }
-        // player.playerMove();
-
     player.playerMove();
 
     glutPostRedisplay();
@@ -273,7 +249,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
-    
+    map.texture.texture();
     
     
     glutInitWindowSize(miniWidth, miniHeight);
