@@ -115,7 +115,41 @@ void timer(int x)
             player.score += 1;
             player.bullets[i][3] = 0;
         }
+        for(int j =0; j< map.boundaries.size();j++){
+            dx = (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][0]+1);
+            dy = (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][2]+1);
+            dist = sqrt(dx*dx+dy*dy);
+            if(dist < 1 + 1 && player.bullets[i][3] > 0)
+            {
+                player.bullets[i][3] = 0;
+                break;
+            }
+
+        }
     }
+    for (int i = 0; i < enemy.bullets.size(); i++)
+    {
+        float dx = (player.pos[0] + sin(player.angle * TO_RADIANS) * 0.5) - (enemy.bullets[i][0] + sin(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (player.pos[2] + cos(player.angle * TO_RADIANS) * 0.5) - (enemy.bullets[i][1] + cos(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 1 && enemy.bullets[i][3] > 0)
+        {
+            player.lives -= 1;
+            enemy.bullets[i][3] = 0;
+        }
+        for (int j = 0; j < map.boundaries.size(); j++)
+        {
+            dx = (enemy.bullets[i][0] + sin(enemy.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][0] + 1);
+            dy = (enemy.bullets[i][1] + cos(enemy.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][2] + 1);
+            dist = sqrt(dx * dx + dy * dy);
+            if (dist < 1 + 1 && enemy.bullets[i][3] > 0)
+            {
+                enemy.bullets[i][3] = 0;
+                break;
+            }
+        }
+    }
+                
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
 }
