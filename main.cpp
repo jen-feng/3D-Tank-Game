@@ -19,7 +19,7 @@ float spec[2][4] = {
     {0.5, 0.5, 0.5, 1},
     {1, 1, 1, 1}};
 Player player = Player();
-Enemy enemy = Enemy(0, -1, 10, 90);
+Enemy enemy = Enemy(0, 0, 10, 90);
 world map = world();
 Image texture;
 const int width = 16 * 80;
@@ -73,10 +73,10 @@ void display()
         player.camDir[0], player.camDir[1], player.camDir[2],
         up[0], up[1], up[2]);
 
-    map.drawWorld();
+    //map.drawWorld();
 
     enemy.draw();
-    enemy.findPath(map.boundaries);
+    //enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
     minimap();
@@ -103,21 +103,25 @@ void minimap(){
 
 void timer(int x)
 {
+
     player.projectileUpdate();
-    enemy.projectileUpdate();
-    for (int i = 0; i < player.bullets.size(); i++)
-    {
-        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
-        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
-        float dist = sqrt(dx * dx + dy * dy);
-        if (dist < 1 + 1 && player.bullets[i][3] > 0)
-        {
-            player.score += 1;
-            player.bullets[i][3] = 0;
-        }
-    }
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
+    // player.projectileUpdate();
+    // enemy.projectileUpdate();
+    // for (int i = 0; i < player.bullets.size(); i++)
+    // {
+    //     float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
+    //     float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
+    //     float dist = sqrt(dx * dx + dy * dy);
+    //     if (dist < 1 + 1 && player.bullets[i][3] > 0)
+    //     {
+    //         player.score += 1;
+    //         player.bullets[i][3] = 0;
+    //     }
+    // }
+    // glutPostRedisplay();
+    // glutTimerFunc(1000 / FPS, timer, 0);
 }
 void keyboard_up(unsigned char key, int x, int y)
 {
@@ -144,6 +148,73 @@ void keyboard_up(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
+// void collisionCheck(float aabb_min[],float aabb_max[]){
+//     float norm[3], len;
+//     bool intersect;
+
+
+//     norm[0] = dir[0] - pos[0];
+//     norm[1] = dir[1] - pos[1];
+//     norm[2] = dir[2] - pos[2];
+
+//     len = sqrt((norm[0]*norm[0])+(norm[1]*norm[1])+(norm[2]*norm[2]));
+
+//     norm[0] = norm[0]/len;
+//     norm[1] = norm[1]/len;
+//     norm[2] = norm[2]/len;
+
+//     intersect = intersectCheck(norm,aabb_min,aabb_max);
+
+//     if(intersect)
+// }
+// bool intersectCheck(float norm[],float aabb_min[],float aabb_max[]){
+
+    
+//     float tmin, tmax, tymin, tymax, tzmin, tzmax;
+//     bool result;
+    
+    
+//     tmin = (aabb_min[0] - pos[0]) / norm[0]; 
+//     tmax = (aabb_max[0] - pos[0]) / norm[0]; 
+    
+//     if (tmin > tmax){
+//         float w=tmin;tmin=tmax;tmax=w;
+//     } 
+
+//     tymin = (aabb_min[1] - pos[1]) / norm[1]; 
+//     tymax = (aabb_max[1] - pos[1]) / norm[1]; 
+
+//     if (tymin > tymax){
+//         float w=tymin;tymin=tymax;tymax=w;
+//     }
+
+//     if ((tmin > tymax) || (tymin > tmax)) 
+//         return  false; 
+
+//     if (tymin > tmin) 
+//         tmin = tymin; 
+
+//     if (tymax < tmax) 
+//         tmax = tymax; 
+
+//     tzmin = (aabb_min[2] - pos[2]) / norm[2]; 
+//     tzmax = (aabb_max[2] - pos[2]) / norm[2];  
+
+//     if (tzmin > tzmax) {
+//         float w=tzmin;tzmin=tzmax;tzmax=w;
+//     }
+
+//     if ((tmin > tzmax) || (tzmin > tmax)) 
+//         return  false;  
+
+//     if (tzmin > tmin) 
+//         tmin = tzmin; 
+
+//     if (tzmax < tmax) 
+//         tmax = tzmax; 
+
+//     return  true; 
+// }
 void keyboard(unsigned char key, int x, int y)
 {
     for(int i =0; i< map.boundaries.size();i++){
@@ -179,35 +250,13 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 32:
         player.shoot();
+        player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
         break;
     case 'r':
     case 'R':
         player.cameraReset();
         break;
     }
-        // switch (key)
-        // {
-        // case 'w':
-        // case 'W':
-        //     player.movement.Forward = true;
-        //     break;
-        // case 'a':
-        // case 'A':
-        //     player.movement.rLeft = true;
-        //     break;
-        // case 's':
-        // case 'S':
-        //     player.movement.Backward = true;
-        //     break;
-        // case 'd':
-        // case 'D':
-        //     player.movement.rRight = true;
-        //     break;
-        // case 32:
-        //     player.shoot();
-        //     break;
-        // }
-        // player.playerMove();
 
     player.playerMove();
 

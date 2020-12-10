@@ -243,12 +243,15 @@ void Tank::move(){
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
 
-        // boundaries[0] = sin(angle * TO_RADIANS) + pos[0] - dx / 2;
-        // boundaries[1] = sin(angle * TO_RADIANS) + pos[0] + dx / 2;
-        // boundaries[2] = cos(angle * TO_RADIANS) + pos[2] - dz / 2;
-        // boundaries[3] = cos(angle * TO_RADIANS) + pos[2] + dz / 2;
     }
 
+    aabb_min[0] = pos[0] + 1;
+    aabb_min[1] = pos[1] + 1;
+    aabb_min[2] = pos[2] + 1;
+
+    aabb_max[0] = pos[0] - 1;
+    aabb_max[1] = pos[1] - 1;
+    aabb_max[2] = pos[2] - 1;
 
 }
 
@@ -286,7 +289,7 @@ void Tank::drawProjectile()
         if (fabs(bullets[i][3]) >= 1)
         {
             glPushMatrix();
-                glTranslatef(bullets[i][0]+sin(angle * TO_RADIANS)*1.5, 0.75, bullets[i][1]+cos(angle * TO_RADIANS)*1.5);
+                glTranslatef(bullets[i][0], 0.75, bullets[i][1]);
                 glColor3f(0.5, 0.5, 0.5);
                 glScalef(0.2, 0.2, 0.2);
                 glutSolidSphere(1, 10, 10);
@@ -309,6 +312,75 @@ void Tank::projectileUpdate()
     }
 }
 
+void Tank::collisionCheck(float aabb_min[],float aabb_max[]){
+    float norm[3], len;
+    bool intersect;
+
+
+    norm[0] = dir[0] - pos[0];
+    norm[1] = dir[1] - pos[1];
+    norm[2] = dir[2] - pos[2];
+
+    len = sqrt((norm[0]*norm[0])+(norm[1]*norm[1])+(norm[2]*norm[2]));
+
+    norm[0] = norm[0]/len;
+    norm[1] = norm[1]/len;
+    norm[2] = norm[2]/len;
+
+    intersect = intersectCheck(norm,this->aabb_min,this->aabb_max);
+
+    if(intersect){
+
+    }
+}
+bool Tank::intersectCheck(float norm[],float aabb_min[],float aabb_max[]){
+
+    
+    float tmin, tmax, tymin, tymax, tzmin, tzmax;
+    bool result;
+    
+    
+    tmin = (this->aabb_min[0] - pos[0]) / norm[0]; 
+    tmax = (this->aabb_max[0] - pos[0]) / norm[0]; 
+    
+    if (tmin > tmax){
+        float w=tmin;tmin=tmax;tmax=w;
+    } 
+
+    tymin = (this->aabb_min[1] - pos[1]) / norm[1]; 
+    tymax = (this->aabb_max[1] - pos[1]) / norm[1]; 
+
+    if (tymin > tymax){
+        float w=tymin;tymin=tymax;tymax=w;
+    }
+
+    if ((tmin > tymax) || (tymin > tmax)) 
+        return  false; 
+
+    if (tymin > tmin) 
+        tmin = tymin; 
+
+    if (tymax < tmax) 
+        tmax = tymax; 
+
+    tzmin = (this->aabb_min[2] - pos[2]) / norm[2]; 
+    tzmax = (this->aabb_max[2] - pos[2]) / norm[2];  
+
+    if (tzmin > tzmax) {
+        float w=tzmin;tzmin=tzmax;tzmax=w;
+    }
+
+    if ((tmin > tzmax) || (tzmin > tmax)) 
+        return  false;  
+
+    if (tzmin > tmin) 
+        tmin = tzmin; 
+
+    if (tzmax < tmax) 
+        tmax = tzmax; 
+
+    return  true; 
+}
 
 Player::Player():Tank(){
 
@@ -333,6 +405,14 @@ Player::Player():Tank(){
     tilt = -0.01;
 
     updateCamera();
+
+    aabb_min[0] = pos[0] + 1;
+    aabb_min[1] = pos[1] + 1;
+    aabb_min[2] = pos[2] + 1;
+
+    aabb_max[0] = pos[0] - 1;
+    aabb_max[1] = pos[1] - 1;
+    aabb_max[2] = pos[2] - 1;
 }
 
 void Player::playerMove(){
@@ -341,6 +421,19 @@ void Player::playerMove(){
 }
 
 void Player::draw(){
+    glDisable(GL_LIGHTING);
+    glPopMatrix();
+    glPushMatrix();
+        glColor3f(0,0,1);
+        glTranslatef(aabb_min[0],aabb_min[1],aabb_min[2]);
+        glutSolidSphere(0.1,10,10);
+    glPopMatrix();
+    glPushMatrix();
+        glColor3f(1,0,0);
+        glTranslatef(aabb_max[0],aabb_max[1],aabb_max[2]);
+        glutSolidSphere(0.1,10,10);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 
     drawProjectile();
     glPushMatrix();
@@ -477,6 +570,14 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
     ang = 0;
     dist = 0;
 
+    aabb_min[0] = pos[0] + 1;
+    aabb_min[1] = 1;
+    aabb_min[2] = pos[2] + 1;
+
+    aabb_max[0] = pos[0] - 1;
+    aabb_max[1] = 0;
+    aabb_max[2] = pos[2] - 1;
+
 }
 
 
@@ -559,10 +660,21 @@ void Enemy::updatePosition(){
 
 void Enemy::draw(){
     
-    drawProjectile();
-
+    glDisable(GL_LIGHTING);
+    glPopMatrix();
     glPushMatrix();
-        glTranslatef(pos[0], pos[1], pos[2]);
+        glColor3f(0,0,1);
+        glTranslatef(aabb_min[0],aabb_min[1],aabb_min[2]);
+        glutSolidSphere(0.5,10,10);
+    glPopMatrix();
+    glPushMatrix();
+        glColor3f(1,0,0);
+        glTranslatef(aabb_max[0],aabb_max[1],aabb_max[2]);
+        glutSolidSphere(0.5,10,10);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+    glPushMatrix();
+        glTranslatef(pos[0], -1, pos[2]);
         glRotatef(angle, 0, 1, 0);
         glPushMatrix();
         glTranslatef(0, 5,0);
