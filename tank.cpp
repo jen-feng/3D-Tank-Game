@@ -425,12 +425,12 @@ void Player::draw(){
     glPopMatrix();
     glPushMatrix();
         glColor3f(0,0,1);
-        glTranslatef(aabb_min[0],aabb_min[1],aabb_min[2]);
+        glTranslatef(boundaries[0],aabb_min[1],boundaries[1]);
         glutSolidSphere(0.1,10,10);
     glPopMatrix();
     glPushMatrix();
         glColor3f(1,0,0);
-        glTranslatef(aabb_max[0],aabb_max[1],aabb_max[2]);
+        glTranslatef(boundaries[3],aabb_max[1],boundaries[4]);
         glutSolidSphere(0.1,10,10);
     glPopMatrix();
     glEnable(GL_LIGHTING);

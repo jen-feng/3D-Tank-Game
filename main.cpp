@@ -217,17 +217,7 @@ void keyboard_up(unsigned char key, int x, int y)
 // }
 void keyboard(unsigned char key, int x, int y)
 {
-    for(int i =0; i< map.boundaries.size();i++){
-        float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][0]+1);
-        float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][2]+1);
-        float dist = sqrt(dx*dx+dy*dy);
-        if(dist < 1 + 0.8)
-        {
-            player.pos[0] -= sin(player.angle * TO_RADIANS);
-            player.pos[2] -= cos(player.angle * TO_RADIANS); 
-            break;
-        }
-    }
+    
 
 
     switch (key)
@@ -262,6 +252,31 @@ void keyboard(unsigned char key, int x, int y)
 
     glutPostRedisplay();
 }
+
+// bool collisionTest(){
+
+//     for(int i =0; i< map.boundaries.size();i++){
+
+//         float d1x = b->min.x - a->max.x;
+//         float d1y = b->min.y - a->max.y;
+//         float d2x = a->min.x - b->max.x;
+//         float d2y = a->min.y - b->max.y;
+
+//         float d1x = map.boundaries[i][0] - player.boundaries[]
+//         float d1z = 
+//         float d2x = 
+//         float d2z = 
+
+//         if (d1x > 0.0f || d1y > 0.0f)
+//             return FALSE;
+
+//         if (d2x > 0.0f || d2y > 0.0f)
+//             return FALSE;
+
+//         return TRUE;
+//     }
+
+// }
 void special(int key, int x, int y)
 {
     if (key == GLUT_KEY_RIGHT)
