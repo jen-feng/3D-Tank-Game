@@ -73,9 +73,9 @@ void display()
         player.camDir[0], player.camDir[1], player.camDir[2],
         up[0], up[1], up[2]);
 
-    //map.drawWorld();
+    map.drawWorld();
 
-    enemy.draw();
+    //enemy.draw();
     //enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
@@ -123,6 +123,37 @@ void timer(int x)
     // glutPostRedisplay();
     // glutTimerFunc(1000 / FPS, timer, 0);
 }
+bool collisionTest(){
+
+    for(int i = 1 ; i < map.boundaries.size();i++){
+
+        // float d1x = b->min.x - a->max.x;
+        // float d1y = b->min.y - a->max.y;
+        // float d2x = a->min.x - b->max.x;
+        // float d2y = a->min.y - b->max.y;
+        //player A: 0 minX 1 maxX 2 minZ 3 maxZ
+        //map B: 0 minX 1 maxX 2 minZ 3 maxZ
+        
+        //printf("%f %f %f %f\n",map.boundaries[i][0],player.aabb_max[0],map.boundaries[i][2],player.aabb_max[2]);
+        float d1x = map.boundaries[i][0] - player.aabb_max[0];
+        float d1z = map.boundaries[i][2] - player.aabb_max[2];
+        float d2x = player.aabb_min[0] - map.boundaries[i][1];
+        float d2z = player.aabb_min[2] - map.boundaries[i][3];
+
+        //printf("%f %f %f %f\n",d1x,d1z,d2x,d2z);
+        //printf("%d\n",map.boundaries.size());
+        //printf("%d\n",i);
+
+        if (d1x > 0.0f || d1z > 0.0f)
+            return FALSE;
+
+        if (d2x > 0.0f || d2z > 0.0f)
+            return FALSE;
+
+        return TRUE;
+    }
+
+}
 void keyboard_up(unsigned char key, int x, int y)
 {
     switch (key)
@@ -148,135 +179,46 @@ void keyboard_up(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
-// void collisionCheck(float aabb_min[],float aabb_max[]){
-//     float norm[3], len;
-//     bool intersect;
-
-
-//     norm[0] = dir[0] - pos[0];
-//     norm[1] = dir[1] - pos[1];
-//     norm[2] = dir[2] - pos[2];
-
-//     len = sqrt((norm[0]*norm[0])+(norm[1]*norm[1])+(norm[2]*norm[2]));
-
-//     norm[0] = norm[0]/len;
-//     norm[1] = norm[1]/len;
-//     norm[2] = norm[2]/len;
-
-//     intersect = intersectCheck(norm,aabb_min,aabb_max);
-
-//     if(intersect)
-// }
-// bool intersectCheck(float norm[],float aabb_min[],float aabb_max[]){
-
-    
-//     float tmin, tmax, tymin, tymax, tzmin, tzmax;
-//     bool result;
-    
-    
-//     tmin = (aabb_min[0] - pos[0]) / norm[0]; 
-//     tmax = (aabb_max[0] - pos[0]) / norm[0]; 
-    
-//     if (tmin > tmax){
-//         float w=tmin;tmin=tmax;tmax=w;
-//     } 
-
-//     tymin = (aabb_min[1] - pos[1]) / norm[1]; 
-//     tymax = (aabb_max[1] - pos[1]) / norm[1]; 
-
-//     if (tymin > tymax){
-//         float w=tymin;tymin=tymax;tymax=w;
-//     }
-
-//     if ((tmin > tymax) || (tymin > tmax)) 
-//         return  false; 
-
-//     if (tymin > tmin) 
-//         tmin = tymin; 
-
-//     if (tymax < tmax) 
-//         tmax = tymax; 
-
-//     tzmin = (aabb_min[2] - pos[2]) / norm[2]; 
-//     tzmax = (aabb_max[2] - pos[2]) / norm[2];  
-
-//     if (tzmin > tzmax) {
-//         float w=tzmin;tzmin=tzmax;tzmax=w;
-//     }
-
-//     if ((tmin > tzmax) || (tzmin > tmax)) 
-//         return  false;  
-
-//     if (tzmin > tmin) 
-//         tmin = tzmin; 
-
-//     if (tzmax < tmax) 
-//         tmax = tzmax; 
-
-//     return  true; 
-// }
 void keyboard(unsigned char key, int x, int y)
 {
-    
+    //printf("collision: %d\n",collisionTest());
+    if(!collisionTest()){
 
+        switch (key)
+        {
+        case 'w':
+        case 'W':
+            player.movement.Forward = true;
+            break;
+        case 'a':
+        case 'A':
+            player.movement.rLeft = true;
+            break;
+        case 's':
+        case 'S':
+            player.movement.Backward = true;
+            break;
+        case 'd':
+        case 'D':
+            player.movement.rRight = true;
+            break;
+        case 32:
+            player.shoot();
+            //player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
+            break;
+        case 'r':
+        case 'R':
+            player.cameraReset();
+            break;
+        }
 
-    switch (key)
-    {
-    case 'w':
-    case 'W':
-        player.movement.Forward = true;
-        break;
-    case 'a':
-    case 'A':
-        player.movement.rLeft = true;
-        break;
-    case 's':
-    case 'S':
-        player.movement.Backward = true;
-        break;
-    case 'd':
-    case 'D':
-        player.movement.rRight = true;
-        break;
-    case 32:
-        player.shoot();
-        player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
-        break;
-    case 'r':
-    case 'R':
-        player.cameraReset();
-        break;
+        player.playerMove();
+
+        glutPostRedisplay();
     }
-
-    player.playerMove();
-
-    glutPostRedisplay();
 }
 
-// bool collisionTest(){
 
-//     for(int i =0; i< map.boundaries.size();i++){
-
-//         float d1x = b->min.x - a->max.x;
-//         float d1y = b->min.y - a->max.y;
-//         float d2x = a->min.x - b->max.x;
-//         float d2y = a->min.y - b->max.y;
-
-//         float d1x = map.boundaries[i][0] - player.boundaries[]
-//         float d1z = 
-//         float d2x = 
-//         float d2z = 
-
-//         if (d1x > 0.0f || d1y > 0.0f)
-//             return FALSE;
-
-//         if (d2x > 0.0f || d2y > 0.0f)
-//             return FALSE;
-
-//         return TRUE;
-//     }
-
-// }
 void special(int key, int x, int y)
 {
     if (key == GLUT_KEY_RIGHT)
@@ -324,6 +266,14 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH );
 
+
+    glutInitWindowPosition((width-miniWidth), (width-miniHeight));
+    glutInitWindowSize(miniWidth, miniHeight);
+    subWindow = glutCreateWindow("MiniMap");
+    
+    glutDisplayFunc(minimap);
+    glutReshapeFunc(reshape);
+
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(width, height);
     mainWindow = glutCreateWindow("Tank Game");
@@ -337,14 +287,6 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
-    
-    
-    glutInitWindowPosition((width-miniWidth), (width-miniHeight));
-    glutInitWindowSize(miniWidth, miniHeight);
-    subWindow = glutCreateWindow("MiniMap");
-    
-    glutDisplayFunc(minimap);
-    glutReshapeFunc(reshape);
 
     map.texture.texture();
     player.bullets.clear();

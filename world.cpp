@@ -106,10 +106,10 @@ bool world::loadObj(const char *fname,
     int read;
     GLfloat x, y, z;
     char ch;
-    float minX = 10000;
-    float minZ = 10000;
-    float maxX = -10000;
-    float maxZ = -10000;
+    float minX;
+    float minZ;
+    float maxX;
+    float maxZ;
     fp = fopen(fname, "r");
     if (!fp)
     {
@@ -195,6 +195,7 @@ bool world::loadObj(const char *fname,
         {
             std::vector<GLfloat> b;
             b.push_back(minX);b.push_back(maxX);b.push_back(minZ);b.push_back(maxZ);
+            printf("%f %f %f %f\n",minX,minZ,maxX,maxZ);
             boundaries.push_back(b);
             minX = 10000;
             minZ = 10000;

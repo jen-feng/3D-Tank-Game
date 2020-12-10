@@ -253,6 +253,8 @@ void Tank::move(){
     aabb_max[1] = pos[1] - 1;
     aabb_max[2] = pos[2] - 1;
 
+    //printf("%f %f\n%f %f\n",pos[0],pos[2], aabb_min[0],aabb_min[2]);
+
 }
 
 void Tank::shoot()
@@ -392,7 +394,7 @@ Player::Player():Tank(){
     // loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
 
-    pos[0] = 2; pos[1] = 1; pos[2] = 2;
+    pos[0] = -1; pos[1] = 1; pos[2] = 0;
 
     angle = 0;
     dir[0] = sin(angle * TO_RADIANS) + pos[0];
@@ -407,12 +409,14 @@ Player::Player():Tank(){
     updateCamera();
 
     aabb_min[0] = pos[0] + 1;
-    aabb_min[1] = pos[1] + 1;
+    // aabb_min[1] = pos[1] + 1;
     aabb_min[2] = pos[2] + 1;
 
     aabb_max[0] = pos[0] - 1;
-    aabb_max[1] = pos[1] - 1;
+    // aabb_max[1] = pos[1] - 1;
     aabb_max[2] = pos[2] - 1;
+
+    //printf("%f %f\n%f %f\n",pos[0],pos[2], aabb_min[0],aabb_min[2]);
 }
 
 void Player::playerMove(){
@@ -425,12 +429,12 @@ void Player::draw(){
     glPopMatrix();
     glPushMatrix();
         glColor3f(0,0,1);
-        glTranslatef(boundaries[0],aabb_min[1],boundaries[1]);
+        glTranslatef(aabb_min[0],0,aabb_min[2]);
         glutSolidSphere(0.1,10,10);
     glPopMatrix();
     glPushMatrix();
         glColor3f(1,0,0);
-        glTranslatef(boundaries[3],aabb_max[1],boundaries[4]);
+        glTranslatef(aabb_max[0],0,aabb_max[2]);
         glutSolidSphere(0.1,10,10);
     glPopMatrix();
     glEnable(GL_LIGHTING);
