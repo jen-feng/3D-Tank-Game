@@ -1,6 +1,8 @@
 #include "main.h"
 
 bool first1 = true;
+
+//initialize the variables for the tank object
 Tank::Tank()
 {
     light_pos[0] = -5; light_pos[1] = 5; light_pos[2] = 5; light_pos[3] = 1.0;
@@ -36,7 +38,7 @@ Tank::Tank()
 
 
 }
-
+//loading the .obj file
 bool Tank::loadObj(const char *fname,
                    std::vector<std::vector<GLfloat> > &out_vertices,
                    std::vector<std::vector<GLfloat> > &out_uvs,
@@ -172,6 +174,7 @@ bool Tank::loadObj(const char *fname,
     return true;
 }
 
+//Draw tank using the values from the loaded obj file
 void Tank::drawTank()
 {
     
@@ -219,47 +222,45 @@ void Tank::drawTank()
     
 }
 
-  
+//Movement calulations based on the button pressed
 void Tank::move(){
-
-    
-
 
     if(movement.Forward){
         
-        pos[0] += sin(angle * TO_RADIANS) * 0.1;
-        pos[2] += cos(angle * TO_RADIANS) * 0.1;
+        pos[0] += sin(angle * TO_RADIANS) * 0.5;
+        pos[2] += cos(angle * TO_RADIANS) * 0.5;
 
-        dir[0] += sin(angle * TO_RADIANS) * 0.1;
-        dir[2] += cos(angle * TO_RADIANS) * 0.1;
+        dir[0] += sin(angle * TO_RADIANS) * 0.5;
+        dir[2] += cos(angle * TO_RADIANS) * 0.5;
 
     }
     if(movement.rLeft){
 
-        angle++;
+        angle+=2;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
     }
     if(movement.Backward){
 
-        pos[0] -= sin(angle * TO_RADIANS) * 0.1;
-        pos[2] -= cos(angle * TO_RADIANS) * 0.1;
+        pos[0] -= sin(angle * TO_RADIANS) * 0.5;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.5;
 
-        dir[0] -= sin(angle * TO_RADIANS) * 0.1;
-        dir[2] -= cos(angle * TO_RADIANS) * 0.1;
+        dir[0] -= sin(angle * TO_RADIANS) * 0.5;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.5;
     }
     if(movement.rRight){
 
-        angle--;
+        angle-=2;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
 
     }
 
-    printf("pos: %f %f %f\ndir: %f %f %f\n",pos[0],pos[1],pos[2],dir[0],dir[1],dir[2]);
+    //printf("pos: %f %f %f\ndir: %f %f %f\n",pos[0],pos[1],pos[2],dir[0],dir[1],dir[2]);
 
+    //aabb is modified with the current position of the tank
     aabb_min[0] = pos[0] - 1;
     aabb_min[1] = pos[1] - 1;
     aabb_min[2] = pos[2] - 1;
@@ -270,6 +271,7 @@ void Tank::move(){
 
 }
 
+//shoot function that creates a bullet object and saves the neccessary direction and pos
 void Tank::shoot()
 {
     
@@ -296,6 +298,7 @@ void Tank::shoot()
     }
 } 
 
+//draws the projectile at its defined coordinates
 void Tank::drawProjectile()
 {
     for (int i = 0; i < bullets.size(); i++)
@@ -312,6 +315,7 @@ void Tank::drawProjectile()
     }
 }
 
+//called when the projectile needs to be updated in the current direction its going
 void Tank::projectileUpdate()
 {
     for (int i = 0; i < bullets.size(); i++)
@@ -326,76 +330,7 @@ void Tank::projectileUpdate()
     }
 }
 
-void Tank::collisionCheck(float aabb_min[],float aabb_max[]){
-    float norm[3], len;
-    bool intersect;
-
-
-    norm[0] = dir[0] - pos[0];
-    norm[1] = dir[1] - pos[1];
-    norm[2] = dir[2] - pos[2];
-
-    len = sqrt((norm[0]*norm[0])+(norm[1]*norm[1])+(norm[2]*norm[2]));
-
-    norm[0] = norm[0]/len;
-    norm[1] = norm[1]/len;
-    norm[2] = norm[2]/len;
-
-    intersect = intersectCheck(norm,this->aabb_min,this->aabb_max);
-
-    if(intersect){
-
-    }
-}
-bool Tank::intersectCheck(float norm[],float aabb_min[],float aabb_max[]){
-
-    
-    float tmin, tmax, tymin, tymax, tzmin, tzmax;
-    bool result;
-    
-    
-    tmin = (this->aabb_min[0] - pos[0]) / norm[0]; 
-    tmax = (this->aabb_max[0] - pos[0]) / norm[0]; 
-    
-    if (tmin > tmax){
-        float w=tmin;tmin=tmax;tmax=w;
-    } 
-
-    tymin = (this->aabb_min[1] - pos[1]) / norm[1]; 
-    tymax = (this->aabb_max[1] - pos[1]) / norm[1]; 
-
-    if (tymin > tymax){
-        float w=tymin;tymin=tymax;tymax=w;
-    }
-
-    if ((tmin > tymax) || (tymin > tmax)) 
-        return  false; 
-
-    if (tymin > tmin) 
-        tmin = tymin; 
-
-    if (tymax < tmax) 
-        tmax = tymax; 
-
-    tzmin = (this->aabb_min[2] - pos[2]) / norm[2]; 
-    tzmax = (this->aabb_max[2] - pos[2]) / norm[2];  
-
-    if (tzmin > tzmax) {
-        float w=tzmin;tzmin=tzmax;tzmax=w;
-    }
-
-    if ((tmin > tzmax) || (tzmin > tmax)) 
-        return  false;  
-
-    if (tzmin > tmin) 
-        tmin = tzmin; 
-
-    if (tzmax < tmax) 
-        tmax = tzmax; 
-
-    return  true; 
-}
-
+//Player class that inherets all the Tank Methods
 Player::Player():Tank(){
 
     m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
@@ -430,26 +365,13 @@ Player::Player():Tank(){
     //printf("%f %f\n%f %f\n",pos[0],pos[2], aabb_min[0],aabb_min[2]);
 }
 
+//player move method for keeping the camera updated as well
 void Player::playerMove(){
     move();
     updateCamera();
 }
 
 void Player::draw(){
-    glDisable(GL_LIGHTING);
-    glPopMatrix();
-    glPushMatrix();
-        glColor3f(0,0,1);
-        glTranslatef(aabb_min[0],0,aabb_min[2]);
-        glutSolidSphere(0.1,10,10);
-    glPopMatrix();
-    glPushMatrix();
-        glColor3f(1,0,0);
-        glTranslatef(aabb_max[0],0,aabb_max[2]);
-        glutSolidSphere(0.1,10,10);
-    glPopMatrix();
-    glEnable(GL_LIGHTING);
-
     drawProjectile();
     glPushMatrix();
         glTranslatef(pos[0], -1, pos[2]);
@@ -458,6 +380,7 @@ void Player::draw(){
     glPopMatrix();
 }
 
+//HUD drawing method
 void Player::drawHUD(){
     /*  
     HUD:
@@ -485,6 +408,7 @@ void Player::drawHUD(){
     // > +x
     // ^ +y
     
+    //crosshair
     glBegin(GL_LINES);
         glColor3f(0, 1, 0);
         glScalef(0.2, 0.2, 0.2);
@@ -494,6 +418,7 @@ void Player::drawHUD(){
         glVertex2f((w/2),(h/2)-40);
 	glEnd();
 
+    //bottom left display
     glBegin(GL_QUADS);
         glColor3f(0.5, 0.5, 0.5);
         glVertex2f(0,0);
@@ -533,7 +458,7 @@ void Player::drawHUD(){
     char livesStr[] = "Lives: %d\0";
     char scoreStr[] = "Score: %d\0";
 
-    
+    //text in the bottom left HUD element
     drawText(8,55,livesStr,lives);
 
     drawText(10,10,scoreStr,score);
@@ -546,7 +471,7 @@ void Player::drawHUD(){
 
 
 }
-
+//method for drawing text
 void Player::drawText(float x, float y, char *inString, int val){
 
     char outputStr[50];
@@ -567,6 +492,7 @@ void Player::drawText(float x, float y, char *inString, int val){
     glPopMatrix();
 }
 
+//method that allows movement of the First person camera while moving the tank
 void Player::updateCamera(){
     camPos[0] = ((sin(angle * TO_RADIANS) * truck) + pos[0]) + (sin((angle-90) * TO_RADIANS)*dolly);
     camPos[1] = 1 + boom;
@@ -575,19 +501,19 @@ void Player::updateCamera(){
     camDir[0] = ((sin((angle-90) * TO_RADIANS)*dolly) + dir[0]);
     camDir[1] = (dir[1] + boom) + tilt;
     camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
-
-    //printf("%f %f %f\n%f %f %f\n",tilt,camPos[1],camPos[2],camDir[0],camDir[1],camDir[2]);
 }
 
+//When R is pressed it puts the camera back to default position
 void Player::cameraReset(){
     truck = 0.0;
     dolly = 0;
     boom = 0.3;
-    tilt = -0.01;
+    tilt = 0;
 
     updateCamera();
 }
 
+//Check if the enemy has collided with the player
 void Player::detectEnemy(float posX, float posZ, float a){
     float dx = (posX+sin(a * TO_RADIANS) * 0.3) - (pos[0]+sin(angle * TO_RADIANS) * 0.3);
     float dy = (posZ+cos(a * TO_RADIANS) * 0.3) - (pos[2]+sin(angle * TO_RADIANS) * 0.3);
@@ -598,6 +524,7 @@ void Player::detectEnemy(float posX, float posZ, float a){
     }
 }
 
+//Enemy class that inherets the tank class
 Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 
     m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
@@ -629,7 +556,7 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 
 }
 
-
+//This allows the enemy tank to move within the boundaries of the maze
 void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
     pos[0] += sin(angle * TO_RADIANS)*0.3;
     pos[2] += cos(angle * TO_RADIANS)*0.3;
@@ -675,6 +602,7 @@ void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
     if (n3 == 15 || n3 == 40) shoot();
 }
 
+//depreciated position update
 void Enemy::updatePosition(){
     rotate = true;
 
@@ -708,20 +636,6 @@ void Enemy::updatePosition(){
 }
 
 void Enemy::draw(){
-    
-    glDisable(GL_LIGHTING);
-    glPopMatrix();
-    glPushMatrix();
-        glColor3f(0,0,1);
-        glTranslatef(aabb_min[0],aabb_min[1],aabb_min[2]);
-        glutSolidSphere(0.5,10,10);
-    glPopMatrix();
-    glPushMatrix();
-        glColor3f(1,0,0);
-        glTranslatef(aabb_max[0],aabb_max[1],aabb_max[2]);
-        glutSolidSphere(0.5,10,10);
-    glPopMatrix();
-    glEnable(GL_LIGHTING);
     drawProjectile();
     glPushMatrix();
         glTranslatef(pos[0], -1, pos[2]);

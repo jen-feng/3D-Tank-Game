@@ -54,6 +54,7 @@ void init(void)
     gluPerspective(60, 16.0 / 9.0, 0.1, 75);
 }
 
+// AABB collision is used for the players Tank 
 bool collisionTest(int i){
 
     float d1z = map.boundaries[i][1] - player.aabb_max[2];
@@ -63,28 +64,6 @@ bool collisionTest(int i){
     float d2x = player.aabb_min[0] - map.boundaries[i][2];
 
     if (d1x > 0.0f || d1z > 0.0f){
-        return false;
-    }
-
-    if (d2x > 0.0f || d2z > 0.0f){
-        return false;
-    }
-    return true;
-
-
-}
-
-bool collisionTest2(int i){
-
-    float d1z = map.boundaries[i][1] - enemy.aabb_max[2];
-    float d1x = map.boundaries[i][0] - enemy.aabb_max[0];
-
-    float d2z = enemy.aabb_min[2] - map.boundaries[i][3];
-    float d2x = enemy.aabb_min[0] - map.boundaries[i][2];
-    
-
-    if (d1x > 0.0f || d1z > 0.0f){
-        
         return false;
     }
 
@@ -127,7 +106,7 @@ void display()
     player.detectEnemy(enemy.pos[0], enemy.pos[2], enemy.angle);
     glFlush();
 }
-
+//minimap draw function
 void minimap(){
     glutSetWindow(subWindow);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -146,6 +125,7 @@ void minimap(){
     player.draw();
 }
 
+//timer function that handles the projectile collision and updating
 void timer(int x)
 {
     enemy.projectileUpdate();
@@ -200,10 +180,7 @@ void timer(int x)
     glutTimerFunc(1000 / FPS, timer, 0);
 
 }
-
-void normalize(){
-    
-}
+//check for keyboard release to disable movement in that direction
 void keyboard_up(unsigned char key, int x, int y)
 {
     switch (key)
@@ -229,13 +206,15 @@ void keyboard_up(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
+//
 void keyboard(unsigned char key, int x, int y)
 {
+    bool collision;
+
     if (player.lives > 0)
     {
-
-        bool collision;
-
+        //the maze boundaries are checked against the bounding box on the players tank
+        //if there is a collision then the pos reverts back to the previous non collided position
         for (int i = 1; i < map.boundaries.size(); i++)
         {
             collision = collisionTest(i);
@@ -275,7 +254,6 @@ void keyboard(unsigned char key, int x, int y)
                 break;
             case 32:
                 player.shoot();
-                //player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
                 break;
             case 'r':
             case 'R':

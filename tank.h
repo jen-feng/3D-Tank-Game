@@ -74,8 +74,6 @@ public:
     
     void projectileUpdate();
     void drawProjectile();
-    void collisionCheck(float aabb_min[],float aabb_max[]);
-    bool intersectCheck(float norm[],float aabb_min[],float aabb_max[]);
 
 };
 
