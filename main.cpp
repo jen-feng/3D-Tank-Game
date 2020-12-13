@@ -77,9 +77,12 @@ void display()
 
     enemy.draw();
     enemy.findPath(map.boundaries);
+    
     player.draw();
     player.drawHUD();
     minimap();
+    player.detectEnemy(enemy.pos[0], enemy.pos[2], enemy.angle);
+
     glFlush();
 }
 
@@ -107,8 +110,8 @@ void timer(int x)
     enemy.projectileUpdate();
     for (int i = 0; i < player.bullets.size(); i++)
     {
-        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
-        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.3) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.3) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
         float dist = sqrt(dx * dx + dy * dy);
         if (dist < 1 + 1 && player.bullets[i][3] > 0)
         {
@@ -129,8 +132,8 @@ void timer(int x)
     }
     for (int i = 0; i < enemy.bullets.size(); i++)
     {
-        float dx = (player.pos[0] + sin(player.angle * TO_RADIANS) * 0.5) - (enemy.bullets[i][0] + sin(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
-        float dy = (player.pos[2] + cos(player.angle * TO_RADIANS) * 0.5) - (enemy.bullets[i][1] + cos(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dx = (player.pos[0] + sin(player.angle * TO_RADIANS) * 0.3) - (enemy.bullets[i][0] + sin(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (player.pos[2] + cos(player.angle * TO_RADIANS) * 0.3) - (enemy.bullets[i][1] + cos(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
         float dist = sqrt(dx * dx + dy * dy);
         if (dist < 1 + 1 && enemy.bullets[i][3] > 0)
         {
@@ -149,6 +152,7 @@ void timer(int x)
             }
         }
     }
+
                 
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
@@ -180,17 +184,21 @@ void keyboard_up(unsigned char key, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
+    if(player.lives > 0) {
+
+    
     for(int i =0; i< map.boundaries.size();i++){
-        float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][0]+1);
-        float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][2]+1);
+        float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.3) - (map.boundaries[i][0]+1);
+        float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.3) - (map.boundaries[i][2]+1);
         float dist = sqrt(dx*dx+dy*dy);
-        if(dist < 1 + 0.8)
+        if(dist < 1 + 0.5)
         {
-            player.pos[0] -= sin(player.angle * TO_RADIANS);
-            player.pos[2] -= cos(player.angle * TO_RADIANS); 
+            player.pos[0] -= sin(player.angle * TO_RADIANS)* 0.3;
+            player.pos[2] -= cos(player.angle * TO_RADIANS)* 0.3; 
             break;
         }
     }
+
 
 
     switch (key)
@@ -220,7 +228,7 @@ void keyboard(unsigned char key, int x, int y)
         break;
     }
     player.playerMove();
-
+    }
     glutPostRedisplay();
 }
 void special(int key, int x, int y)
@@ -257,6 +265,18 @@ void special(int key, int x, int y)
     glutPostRedisplay();
 }
 
+void mouse(int button, int state, int x, int y)
+{
+    if( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && player.lives < 1 )
+    {
+        if (450 < x && x < 830 && 175 < y && y < 830) {
+            Player newP = Player();
+            player = newP;
+            enemy = Enemy(20, -1, 10, 90);
+        }
+    }
+}
+
 void reshape(int w, int h)
 {
     glViewport(0, 0, w, h);
@@ -283,6 +303,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
+    glutMouseFunc(mouse);
     map.texture.texture();
     
     

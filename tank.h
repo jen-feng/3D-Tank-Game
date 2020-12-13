@@ -85,6 +85,7 @@ class Player: public Tank
     void cameraReset();
     void draw();
     void drawHUD();
+    void detectEnemy(float posX, float posZ, float a);
     void drawText(float x, float y, char *inString, int val);
 };
 

@@ -214,11 +214,11 @@ void Tank::move(){
 
     if(movement.Forward){
         
-        pos[0] += sin(angle * TO_RADIANS) * 0.5;
-        pos[2] += cos(angle * TO_RADIANS) * 0.5;
+        pos[0] += sin(angle * TO_RADIANS) * 0.3;
+        pos[2] += cos(angle * TO_RADIANS) * 0.3;
 
-        dir[0] += sin(angle * TO_RADIANS) * 0.5;
-        dir[2] += cos(angle * TO_RADIANS) * 0.5;
+        dir[0] += sin(angle * TO_RADIANS) * 0.3;
+        dir[2] += cos(angle * TO_RADIANS) * 0.3;
 
     }
     if(movement.rLeft){
@@ -230,11 +230,11 @@ void Tank::move(){
     }
     if(movement.Backward){
 
-        pos[0] -= sin(angle * TO_RADIANS) * 0.5;
-        pos[2] -= cos(angle * TO_RADIANS) * 0.5;
+        pos[0] -= sin(angle * TO_RADIANS) * 0.3;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.3;
 
-        dir[0] -= sin(angle * TO_RADIANS) * 0.5;
-        dir[2] -= cos(angle * TO_RADIANS) * 0.5;
+        dir[0] -= sin(angle * TO_RADIANS) * 0.3;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.3;
     }
     if(movement.rRight){
 
@@ -320,7 +320,7 @@ Player::Player():Tank(){
     // loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
 
-    pos[0] = 2; pos[1] = 1; pos[2] = 2;
+    pos[0] = -15; pos[1] = 1; pos[2] = 5;
 
     angle = 0;
     dir[0] = sin(angle * TO_RADIANS) + pos[0];
@@ -376,7 +376,6 @@ void Player::drawHUD(){
 
     // > +x
     // ^ +y
-    
     glBegin(GL_LINES);
         glColor3f(0, 1, 0);
         glScalef(0.2, 0.2, 0.2);
@@ -399,7 +398,28 @@ void Player::drawHUD(){
         glVertex2f(100,100);
         glVertex2f(5,100);
 	glEnd();
-    
+    if(lives == 0)
+    {
+        glBegin(GL_LINES);
+        glColor3f(0.5, 0.5, 0.5);
+        glVertex2f(w/2 - 200,h/2 - 200);
+        glVertex2f(w/2 + 200,h/2 - 200);
+        glVertex2f(w/2 + 200,h/2 + 200);
+        glVertex2f(w/2 - 200,h/2 + 200);
+	    glEnd();
+        
+        glBegin(GL_QUADS);
+        glColor3f(1, 1, 1);
+        glVertex2f(w/2 - 190,h/2 - 190);
+        glVertex2f(w/2 + 190,h/2 - 190);
+        glVertex2f(w/2 + 190,h/2 + 190);
+        glVertex2f(w/2 - 190,h/2 + 190);
+	    glEnd();
+        char msg[] = "You collided with Enemy!\0";
+        char restart[] = "Click to Restart Game\0";
+        drawText(w/2-170,h/2, msg, 0);
+        drawText(w/2-170,h/2+40, restart, 0);
+    }
     char livesStr[] = "Lives: %d\0";
     char scoreStr[] = "Score: %d\0";
 
@@ -481,8 +501,8 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 
 
 void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
-    pos[0] += sin(angle * TO_RADIANS)*0.1;
-    pos[2] += cos(angle * TO_RADIANS)*0.1;
+    pos[0] += sin(angle * TO_RADIANS)*0.3;
+    pos[2] += cos(angle * TO_RADIANS)*0.3;
     for (int i = 0; i < boundaries.size(); i++)
     {
         float dx = (pos[0] + sin(angle * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
@@ -523,6 +543,16 @@ void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
     }
     int n3 = rand() % 100;
     if (n3 == 56 || n3 == 78) shoot();
+}
+
+void Player::detectEnemy(float posX, float posZ, float a){
+    float dx = (posX+sin(a * TO_RADIANS) * 0.3) - (pos[0]+sin(angle * TO_RADIANS) * 0.3);
+    float dy = (posZ+cos(a * TO_RADIANS) * 0.3) - (pos[2]+sin(angle * TO_RADIANS) * 0.3);
+    float dist = sqrt(dx*dx+dy*dy);
+    if(dist < 3)
+    {
+        lives=0;
+    }
 }
 
 void Enemy::updatePosition(){

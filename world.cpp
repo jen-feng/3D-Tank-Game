@@ -106,10 +106,10 @@ bool world::loadObj(const char *fname,
     int read;
     GLfloat x, y, z;
     char ch;
-    float minX = 10000;
-    float minZ = 10000;
-    float maxX = -10000;
-    float maxZ = -10000;
+    float minX;
+    float minZ;
+    float maxX;
+    float maxZ;
     fp = fopen(fname, "r");
     if (!fp)
     {
