@@ -2,6 +2,8 @@
 #include "world.h"
 #include "PPM.cc"
 
+bool first = true;
+
 world::world()
 {
     m_ambient[0] = 0.1f; m_ambient[1] = 0.1f; m_ambient[2] = 0.05f;  m_ambient[3] = 1.0f;
@@ -129,18 +131,30 @@ bool world::loadObj(const char *fname,
         {
             std::vector<GLfloat> v;
             fscanf(fp, "%f %f %f\n", &x, &y, &z);
+
+            if(first){
+
+                minX = x;maxX = x;
+                minZ = z;maxZ = z;
+                first = false;
+            }
+
+
             if(x < minX){
                 minX = x;
             }
             else if(x > maxX){
                 maxX = x;
             }
-            if(y < minZ){
+            if(z < minZ){
                 minZ = z;
             }
-            else if(y > maxZ){
+            else if(z > maxZ){
                 maxZ = z;
             }
+
+            
+
             v.push_back(x);
             v.push_back(y);
             v.push_back(z);
@@ -149,6 +163,9 @@ bool world::loadObj(const char *fname,
         }
         else if (strcmp(lineHeader, "vt") == 0)
         {
+
+            
+
             std::vector<GLfloat> vt;
             fscanf(fp, "%f %f\n", &x, &y);
             vt.push_back(x);
@@ -193,14 +210,10 @@ bool world::loadObj(const char *fname,
         }
         else if(strcmp(lineHeader, "o") == 0)
         {
+            first = true;
             std::vector<GLfloat> b;
-            b.push_back(minX);b.push_back(maxX);b.push_back(minZ);b.push_back(maxZ);
-            printf("%f %f %f %f\n",minX,minZ,maxX,maxZ);
+            b.push_back(minX);b.push_back(minZ);b.push_back(maxX);b.push_back(maxZ);
             boundaries.push_back(b);
-            minX = 10000;
-            minZ = 10000;
-            maxX = -10000;
-            maxZ = -10000;
         }
     }
 

@@ -1,5 +1,6 @@
 #include "main.h"
 
+bool first1 = true;
 Tank::Tank()
 {
     light_pos[0] = -5; light_pos[1] = 5; light_pos[2] = 5; light_pos[3] = 1.0;
@@ -72,17 +73,25 @@ bool Tank::loadObj(const char *fname,
         {
             std::vector<GLfloat> v;
             fscanf(fp, "%f %f %f\n", &x, &y, &z);
+            if(first1){
+
+                minX = x;maxX = x;
+                minZ = z;maxZ = z;
+                first1 = false;
+            }
+
+
             if(x < minX){
                 minX = x;
             }
             else if(x > maxX){
                 maxX = x;
             }
-            if(y < minZ){
-                minZ = y;
+            if(z < minZ){
+                minZ = z;
             }
-            else if(y > maxZ){
-                maxZ = y;
+            else if(z > maxZ){
+                maxZ = z;
             }
             v.push_back(x);
             v.push_back(y);
@@ -139,6 +148,7 @@ bool Tank::loadObj(const char *fname,
     boundaries.push_back(maxX);
     boundaries.push_back(minZ);
     boundaries.push_back(maxZ);
+    first1 = false;
 
     for (unsigned int i = 0; i < vertexIndices.size(); i++)
     {
@@ -212,13 +222,18 @@ void Tank::drawTank()
   
 void Tank::move(){
 
+    prevPos[0] = pos[0];
+    prevPos[1] = pos[1];
+    prevPos[2] = pos[2];
+
+
     if(movement.Forward){
         
-        pos[0] += sin(angle * TO_RADIANS) * 0.5;
-        pos[2] += cos(angle * TO_RADIANS) * 0.5;
+        pos[0] += sin(angle * TO_RADIANS) * 0.1;
+        pos[2] += cos(angle * TO_RADIANS) * 0.1;
 
-        dir[0] += sin(angle * TO_RADIANS) * 0.5;
-        dir[2] += cos(angle * TO_RADIANS) * 0.5;
+        dir[0] += sin(angle * TO_RADIANS) * 0.1;
+        dir[2] += cos(angle * TO_RADIANS) * 0.1;
 
     }
     if(movement.rLeft){
@@ -230,11 +245,11 @@ void Tank::move(){
     }
     if(movement.Backward){
 
-        pos[0] -= sin(angle * TO_RADIANS) * 0.5;
-        pos[2] -= cos(angle * TO_RADIANS) * 0.5;
+        pos[0] -= sin(angle * TO_RADIANS) * 0.1;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.1;
 
-        dir[0] -= sin(angle * TO_RADIANS) * 0.5;
-        dir[2] -= cos(angle * TO_RADIANS) * 0.5;
+        dir[0] -= sin(angle * TO_RADIANS) * 0.1;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.1;
     }
     if(movement.rRight){
 
@@ -245,15 +260,15 @@ void Tank::move(){
 
     }
 
-    aabb_min[0] = pos[0] + 1;
-    aabb_min[1] = pos[1] + 1;
-    aabb_min[2] = pos[2] + 1;
+    printf("pos: %f %f %f\ndir: %f %f %f\n",pos[0],pos[1],pos[2],dir[0],dir[1],dir[2]);
 
-    aabb_max[0] = pos[0] - 1;
-    aabb_max[1] = pos[1] - 1;
-    aabb_max[2] = pos[2] - 1;
+    aabb_min[0] = pos[0] - 1;
+    aabb_min[1] = pos[1] - 1;
+    aabb_min[2] = pos[2] - 1;
 
-    //printf("%f %f\n%f %f\n",pos[0],pos[2], aabb_min[0],aabb_min[2]);
+    aabb_max[0] = pos[0] + 1;
+    aabb_max[1] = pos[1] + 1;
+    aabb_max[2] = pos[2] + 1;
 
 }
 
@@ -391,7 +406,6 @@ Player::Player():Tank(){
     m_specular[0] = 0.45f; m_specular[1] = 0.55f; m_specular[2] = 0.45f; m_specular[3] = 1.0f;
     m_shininess = 32.0f;
 
-    // loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
     loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
 
     pos[0] = -1; pos[1] = 1; pos[2] = 0;
@@ -404,17 +418,17 @@ Player::Player():Tank(){
     truck = 0.0;
     dolly = 0;
     boom = 0.3;
-    tilt = -0.01;
+    tilt = 0;
 
     updateCamera();
 
-    aabb_min[0] = pos[0] + 1;
+    aabb_min[0] = pos[0] - 1;
     // aabb_min[1] = pos[1] + 1;
-    aabb_min[2] = pos[2] + 1;
+    aabb_min[2] = pos[2] - 1;
 
-    aabb_max[0] = pos[0] - 1;
+    aabb_max[0] = pos[0] + 1;
     // aabb_max[1] = pos[1] - 1;
-    aabb_max[2] = pos[2] - 1;
+    aabb_max[2] = pos[2] + 1;
 
     //printf("%f %f\n%f %f\n",pos[0],pos[2], aabb_min[0],aabb_min[2]);
 }
@@ -536,12 +550,14 @@ void Player::drawText(float x, float y, char *inString, int val){
 
 void Player::updateCamera(){
     camPos[0] = ((sin(angle * TO_RADIANS) * truck) + pos[0]) + (sin((angle-90) * TO_RADIANS)*dolly);
-    camPos[1] = pos[1] + boom;
+    camPos[1] = 1 + boom;
     camPos[2] = ((cos(angle * TO_RADIANS) * truck) + pos[2]) + (cos((angle-90) * TO_RADIANS)*dolly);
 
     camDir[0] = ((sin((angle-90) * TO_RADIANS)*dolly) + dir[0]);
     camDir[1] = (dir[1] + boom) + tilt;
     camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
+
+    //printf("%f %f %f\n%f %f %f\n",tilt,camPos[1],camPos[2],camDir[0],camDir[1],camDir[2]);
 }
 
 void Player::cameraReset(){
@@ -574,13 +590,13 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
     ang = 0;
     dist = 0;
 
-    aabb_min[0] = pos[0] + 1;
+    aabb_min[0] = pos[0] - 1;
     aabb_min[1] = 1;
-    aabb_min[2] = pos[2] + 1;
+    aabb_min[2] = pos[2] - 1;
 
-    aabb_max[0] = pos[0] - 1;
+    aabb_max[0] = pos[0] + 1;
     aabb_max[1] = 0;
-    aabb_max[2] = pos[2] - 1;
+    aabb_max[2] = pos[2] + 1;
 
 }
 

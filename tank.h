@@ -43,6 +43,7 @@ public:
     }movement;
     
     float pos[3];
+    float prevPos[3];
     float dir[3];
 
     float camPos[3];

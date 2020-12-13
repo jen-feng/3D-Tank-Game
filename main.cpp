@@ -123,36 +123,27 @@ void timer(int x)
     // glutPostRedisplay();
     // glutTimerFunc(1000 / FPS, timer, 0);
 }
-bool collisionTest(){
+bool collisionTest(int i){
 
-    for(int i = 1 ; i < map.boundaries.size();i++){
+    float d1z = map.boundaries[i][1] - player.aabb_max[2];
+    float d1x = map.boundaries[i][0] - player.aabb_max[0];
 
-        // float d1x = b->min.x - a->max.x;
-        // float d1y = b->min.y - a->max.y;
-        // float d2x = a->min.x - b->max.x;
-        // float d2y = a->min.y - b->max.y;
-        //player A: 0 minX 1 maxX 2 minZ 3 maxZ
-        //map B: 0 minX 1 maxX 2 minZ 3 maxZ
-        
-        //printf("%f %f %f %f\n",map.boundaries[i][0],player.aabb_max[0],map.boundaries[i][2],player.aabb_max[2]);
-        float d1x = map.boundaries[i][0] - player.aabb_max[0];
-        float d1z = map.boundaries[i][2] - player.aabb_max[2];
-        float d2x = player.aabb_min[0] - map.boundaries[i][1];
-        float d2z = player.aabb_min[2] - map.boundaries[i][3];
+    float d2z = player.aabb_min[2] - map.boundaries[i][3];
+    float d2x = player.aabb_min[0] - map.boundaries[i][2];
 
-        //printf("%f %f %f %f\n",d1x,d1z,d2x,d2z);
-        //printf("%d\n",map.boundaries.size());
-        //printf("%d\n",i);
-
-        if (d1x > 0.0f || d1z > 0.0f)
-            return FALSE;
-
-        if (d2x > 0.0f || d2z > 0.0f)
-            return FALSE;
-
-        return TRUE;
+    if (d1x > 0.0f || d1z > 0.0f){
+        return FALSE;
     }
 
+    if (d2x > 0.0f || d2z > 0.0f){
+        return FALSE;
+    }
+    return TRUE;
+
+
+}
+void normalize(){
+    
 }
 void keyboard_up(unsigned char key, int x, int y)
 {
@@ -180,9 +171,24 @@ void keyboard_up(unsigned char key, int x, int y)
 }
 
 void keyboard(unsigned char key, int x, int y)
-{
-    //printf("collision: %d\n",collisionTest());
-    if(!collisionTest()){
+{   
+    bool collision;
+
+    for(int i = 1 ; i < map.boundaries.size();i++){
+        collision = collisionTest(i);
+
+        if(collision){
+               
+            player.pos[0] = player.prevPos[0];
+            player.pos[1] = player.prevPos[1];
+            player.pos[2] = player.prevPos[2];
+            player.updateCamera();
+            break;
+        }
+    }
+
+    if(!collision)
+    {
 
         switch (key)
         {
@@ -216,6 +222,7 @@ void keyboard(unsigned char key, int x, int y)
 
         glutPostRedisplay();
     }
+
 }
 
 
@@ -224,14 +231,14 @@ void special(int key, int x, int y)
     if (key == GLUT_KEY_RIGHT)
     {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
-            player.tilt += 0.1;
+            player.tilt += 0.01;
         else
             player.dolly += 0.1;
     }
     if (key == GLUT_KEY_LEFT)
     {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
-            player.tilt -= 0.1;
+            player.tilt -= 0.01;
         else
             player.dolly -= 0.1;
     }
