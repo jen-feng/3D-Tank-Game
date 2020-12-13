@@ -222,9 +222,7 @@ void Tank::drawTank()
   
 void Tank::move(){
 
-    prevPos[0] = pos[0];
-    prevPos[1] = pos[1];
-    prevPos[2] = pos[2];
+    
 
 
     if(movement.Forward){

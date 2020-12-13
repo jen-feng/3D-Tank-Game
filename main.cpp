@@ -31,6 +31,7 @@ unsigned int fbo;
 bool col = true;
 
 bool move = false;
+float prevPos[3];
 
 void minimap();
 
@@ -240,9 +241,9 @@ void keyboard(unsigned char key, int x, int y)
             collision = collisionTest(i);
             if (collision)
             {
-                player.pos[0] -= sin(player.angle * TO_RADIANS) * 0.1;
-                player.pos[1] = player.prevPos[1];
-                player.pos[2] -= cos(player.angle * TO_RADIANS) * 0.1;
+                player.pos[0] = prevPos[0];
+                player.pos[1] = prevPos[1];
+                player.pos[2] = prevPos[2];
                 player.updateCamera();
                 break;
             }
@@ -250,6 +251,9 @@ void keyboard(unsigned char key, int x, int y)
 
         if (!collision)
         {
+            prevPos[0] = player.pos[0];
+            prevPos[1] = player.pos[1];
+            prevPos[2] = player.pos[2];
 
             switch (key)
             {
