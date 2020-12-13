@@ -123,6 +123,7 @@ void display()
     player.draw();
     player.drawHUD();
     minimap();
+    player.detectEnemy(enemy.pos[0], enemy.pos[2], enemy.angle);
     glFlush();
 }
 
@@ -148,23 +149,55 @@ void timer(int x)
 {
     enemy.projectileUpdate();
     player.projectileUpdate();
+    //player's bullets collision detection with walls and enemy
+    for (int i = 0; i < player.bullets.size(); i++)
+    {
+        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.3) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.3) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 1 && player.bullets[i][3] > 0)
+        {
+            player.score += 1;
+            player.bullets[i][3] = 0;
+        }
+        for(int j =0; j< map.boundaries.size();j++){
+            dx = (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][0]+1);
+            dy = (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][1]+1);
+            dist = sqrt(dx*dx+dy*dy);
+            if(dist < 1 + 0.5 && player.bullets[i][3] > 0)
+            {
+                player.bullets[i][3] = 0;
+                break;
+            }
+
+        }
+    }
+    //Enemy's bullets collision detection with walls and player
+    for (int i = 0; i < enemy.bullets.size(); i++)
+    {
+        float dx = (player.pos[0] + sin(player.angle * TO_RADIANS) * 0.3) - (enemy.bullets[i][0] + sin(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dy = (player.pos[2] + cos(player.angle * TO_RADIANS) * 0.3) - (enemy.bullets[i][1] + cos(enemy.bullets[i][2] * TO_RADIANS) * 0.5);
+        float dist = sqrt(dx * dx + dy * dy);
+        if (dist < 1 + 1 && enemy.bullets[i][3] > 0)
+        {
+            player.lives -= 1;
+            enemy.bullets[i][3] = 0;
+        }
+        for (int j = 0; j < map.boundaries.size(); j++)
+        {
+            dx = (enemy.bullets[i][0] + sin(enemy.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][0] + 1);
+            dy = (enemy.bullets[i][1] + cos(enemy.bullets[i][2] * TO_RADIANS) * 0.5) - (map.boundaries[j][1] + 1);
+            dist = sqrt(dx * dx + dy * dy);
+            if (dist < 1 + 0.5 && enemy.bullets[i][3] > 0)
+            {
+                enemy.bullets[i][3] = 0;
+                break;
+            }
+        }
+    }
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
-    // player.projectileUpdate();
-    // 
-    // for (int i = 0; i < player.bullets.size(); i++)
-    // {
-    //     float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
-    //     float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
-    //     float dist = sqrt(dx * dx + dy * dy);
-    //     if (dist < 1 + 1 && player.bullets[i][3] > 0)
-    //     {
-    //         player.score += 1;
-    //         player.bullets[i][3] = 0;
-    //     }
-    // }
-    // glutPostRedisplay();
-    // glutTimerFunc(1000 / FPS, timer, 0);
+
 }
 
 void normalize(){
@@ -196,57 +229,61 @@ void keyboard_up(unsigned char key, int x, int y)
 }
 
 void keyboard(unsigned char key, int x, int y)
-{   
-    bool collision;
-
-    for(int i = 1 ; i < map.boundaries.size();i++){
-        collision = collisionTest(i);
-        if(collision){
-            player.pos[0] -= sin(player.angle * TO_RADIANS) * 0.1;
-            player.pos[1] = player.prevPos[1];
-            player.pos[2] -= cos(player.angle * TO_RADIANS) * 0.1;
-            player.updateCamera();
-            break;
-        }
-    }
-
-
-    if(!collision)
+{
+    if (player.lives > 0)
     {
 
-        switch (key)
+        bool collision;
+
+        for (int i = 1; i < map.boundaries.size(); i++)
         {
-        case 'w':
-        case 'W':
-            player.movement.Forward = true;
-            break;
-        case 'a':
-        case 'A':
-            player.movement.rLeft = true;
-            break;
-        case 's':
-        case 'S':
-            player.movement.Backward = true;
-            break;
-        case 'd':
-        case 'D':
-            player.movement.rRight = true;
-            break;
-        case 32:
-            player.shoot();
-            //player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
-            break;
-        case 'r':
-        case 'R':
-            player.cameraReset();
-            break;
+            collision = collisionTest(i);
+            if (collision)
+            {
+                player.pos[0] -= sin(player.angle * TO_RADIANS) * 0.1;
+                player.pos[1] = player.prevPos[1];
+                player.pos[2] -= cos(player.angle * TO_RADIANS) * 0.1;
+                player.updateCamera();
+                break;
+            }
         }
 
-        player.playerMove();
+        if (!collision)
+        {
 
-        glutPostRedisplay();
+            switch (key)
+            {
+            case 'w':
+            case 'W':
+                player.movement.Forward = true;
+                break;
+            case 'a':
+            case 'A':
+                player.movement.rLeft = true;
+                break;
+            case 's':
+            case 'S':
+                player.movement.Backward = true;
+                break;
+            case 'd':
+            case 'D':
+                player.movement.rRight = true;
+                break;
+            case 32:
+                player.shoot();
+                //player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
+                break;
+            case 'r':
+            case 'R':
+                player.cameraReset();
+                break;
+            }
+
+            player.playerMove();
+
+            glutPostRedisplay();
+        }
     }
-
 }
 
 
@@ -284,6 +321,18 @@ void special(int key, int x, int y)
     glutPostRedisplay();
 }
 
+void mouse(int button, int state, int x, int y)
+{
+    if( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && player.lives < 1 )
+    {
+        if (450 < x && x < 830 && 175 < y && y < 830) {
+            Player newP = Player();
+            player = newP;
+            enemy = Enemy(20, -1, 10, 90);
+        }
+    }
+}
+
 void reshape(int w, int h)
 {
     glViewport(0, 0, w, h);
@@ -318,6 +367,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
+    glutMouseFunc(mouse);
 
     map.texture.texture();
     player.bullets.clear();

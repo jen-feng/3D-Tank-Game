@@ -509,7 +509,29 @@ void Player::drawHUD(){
         glVertex2f(100,100);
         glVertex2f(5,100);
 	glEnd();
-    
+    //restart menu
+    if(lives == 0)
+    {
+        glBegin(GL_LINES);
+        glColor3f(0.5, 0.5, 0.5);
+        glVertex2f(w/2 - 200,h/2 - 200);
+        glVertex2f(w/2 + 200,h/2 - 200);
+        glVertex2f(w/2 + 200,h/2 + 200);
+        glVertex2f(w/2 - 200,h/2 + 200);
+	    glEnd();
+        
+        glBegin(GL_QUADS);
+        glColor3f(1, 1, 1);
+        glVertex2f(w/2 - 190,h/2 - 190);
+        glVertex2f(w/2 + 190,h/2 - 190);
+        glVertex2f(w/2 + 190,h/2 + 190);
+        glVertex2f(w/2 - 190,h/2 + 190);
+	    glEnd();
+        char msg[] = "You collided with Enemy!\0";
+        char restart[] = "Click to Restart Game\0";
+        drawText(w/2-170,h/2, msg, 0);
+        drawText(w/2-170,h/2+40, restart, 0);
+    }
     char livesStr[] = "Lives: %d\0";
     char scoreStr[] = "Score: %d\0";
 
@@ -566,6 +588,16 @@ void Player::cameraReset(){
     tilt = -0.01;
 
     updateCamera();
+}
+
+void Player::detectEnemy(float posX, float posZ, float a){
+    float dx = (posX+sin(a * TO_RADIANS) * 0.3) - (pos[0]+sin(angle * TO_RADIANS) * 0.3);
+    float dy = (posZ+cos(a * TO_RADIANS) * 0.3) - (pos[2]+sin(angle * TO_RADIANS) * 0.3);
+    float dist = sqrt(dx*dx+dy*dy);
+    if(dist < 3)
+    {
+        lives=0;
+    }
 }
 
 Enemy::Enemy(float x, float y, float z, float angle):Tank(){
