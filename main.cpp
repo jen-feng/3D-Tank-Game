@@ -19,7 +19,7 @@ float spec[2][4] = {
     {0.5, 0.5, 0.5, 1},
     {1, 1, 1, 1}};
 Player player = Player();
-Enemy enemy = Enemy(0, 0, 10, 90);
+Enemy enemy = Enemy(-6, 0, -10, 90);
 world map = world();
 Image texture;
 const int width = 16 * 80;
@@ -28,6 +28,7 @@ const int miniWidth = 300;
 const int miniHeight = 300;
 GLint mainWindow, subWindow;
 unsigned int fbo;
+bool col = true;
 
 bool move = false;
 
@@ -50,6 +51,48 @@ void init(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60, 16.0 / 9.0, 0.1, 75);
+}
+
+bool collisionTest(int i){
+
+    float d1z = map.boundaries[i][1] - player.aabb_max[2];
+    float d1x = map.boundaries[i][0] - player.aabb_max[0];
+
+    float d2z = player.aabb_min[2] - map.boundaries[i][3];
+    float d2x = player.aabb_min[0] - map.boundaries[i][2];
+
+    if (d1x > 0.0f || d1z > 0.0f){
+        return false;
+    }
+
+    if (d2x > 0.0f || d2z > 0.0f){
+        return false;
+    }
+    return true;
+
+
+}
+
+bool collisionTest2(int i){
+
+    float d1z = map.boundaries[i][1] - enemy.aabb_max[2];
+    float d1x = map.boundaries[i][0] - enemy.aabb_max[0];
+
+    float d2z = enemy.aabb_min[2] - map.boundaries[i][3];
+    float d2x = enemy.aabb_min[0] - map.boundaries[i][2];
+    
+
+    if (d1x > 0.0f || d1z > 0.0f){
+        
+        return false;
+    }
+
+    if (d2x > 0.0f || d2z > 0.0f){
+        return false;
+    }
+    return true;
+
+
 }
 
 void display()
@@ -75,8 +118,8 @@ void display()
 
     map.drawWorld();
 
-    //enemy.draw();
-    //enemy.findPath(map.boundaries);
+    enemy.draw();
+    enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
     minimap();
@@ -103,12 +146,12 @@ void minimap(){
 
 void timer(int x)
 {
-
+    enemy.projectileUpdate();
     player.projectileUpdate();
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
     // player.projectileUpdate();
-    // enemy.projectileUpdate();
+    // 
     // for (int i = 0; i < player.bullets.size(); i++)
     // {
     //     float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
@@ -123,25 +166,7 @@ void timer(int x)
     // glutPostRedisplay();
     // glutTimerFunc(1000 / FPS, timer, 0);
 }
-bool collisionTest(int i){
 
-    float d1z = map.boundaries[i][1] - player.aabb_max[2];
-    float d1x = map.boundaries[i][0] - player.aabb_max[0];
-
-    float d2z = player.aabb_min[2] - map.boundaries[i][3];
-    float d2x = player.aabb_min[0] - map.boundaries[i][2];
-
-    if (d1x > 0.0f || d1z > 0.0f){
-        return FALSE;
-    }
-
-    if (d2x > 0.0f || d2z > 0.0f){
-        return FALSE;
-    }
-    return TRUE;
-
-
-}
 void normalize(){
     
 }
@@ -176,16 +201,15 @@ void keyboard(unsigned char key, int x, int y)
 
     for(int i = 1 ; i < map.boundaries.size();i++){
         collision = collisionTest(i);
-
         if(collision){
-               
-            player.pos[0] = player.prevPos[0];
+            player.pos[0] -= sin(player.angle * TO_RADIANS) * 0.1;
             player.pos[1] = player.prevPos[1];
-            player.pos[2] = player.prevPos[2];
+            player.pos[2] -= cos(player.angle * TO_RADIANS) * 0.1;
             player.updateCamera();
             break;
         }
     }
+
 
     if(!collision)
     {
