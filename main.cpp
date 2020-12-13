@@ -19,7 +19,7 @@ float spec[2][4] = {
     {0.5, 0.5, 0.5, 1},
     {1, 1, 1, 1}};
 Player player = Player();
-Enemy enemy = Enemy(0, -1, 10, 90);
+Enemy enemy = Enemy(0, 0, 10, 90);
 world map = world();
 Image texture;
 const int width = 16 * 80;
@@ -75,8 +75,8 @@ void display()
 
     map.drawWorld();
 
-    enemy.draw();
-    enemy.findPath(map.boundaries);
+    //enemy.draw();
+    //enemy.findPath(map.boundaries);
     player.draw();
     player.drawHUD();
     minimap();
@@ -103,21 +103,47 @@ void minimap(){
 
 void timer(int x)
 {
+
     player.projectileUpdate();
-    enemy.projectileUpdate();
-    for (int i = 0; i < player.bullets.size(); i++)
-    {
-        float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
-        float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
-        float dist = sqrt(dx * dx + dy * dy);
-        if (dist < 1 + 1 && player.bullets[i][3] > 0)
-        {
-            player.score += 1;
-            player.bullets[i][3] = 0;
-        }
-    }
     glutPostRedisplay();
     glutTimerFunc(1000 / FPS, timer, 0);
+    // player.projectileUpdate();
+    // enemy.projectileUpdate();
+    // for (int i = 0; i < player.bullets.size(); i++)
+    // {
+    //     float dx = (enemy.pos[0] + sin(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][0] + sin(player.bullets[i][2] * TO_RADIANS) * 0.5);
+    //     float dy = (enemy.pos[2] + cos(enemy.angle * TO_RADIANS) * 0.5) - (player.bullets[i][1] + cos(player.bullets[i][2] * TO_RADIANS) * 0.5);
+    //     float dist = sqrt(dx * dx + dy * dy);
+    //     if (dist < 1 + 1 && player.bullets[i][3] > 0)
+    //     {
+    //         player.score += 1;
+    //         player.bullets[i][3] = 0;
+    //     }
+    // }
+    // glutPostRedisplay();
+    // glutTimerFunc(1000 / FPS, timer, 0);
+}
+bool collisionTest(int i){
+
+    float d1z = map.boundaries[i][1] - player.aabb_max[2];
+    float d1x = map.boundaries[i][0] - player.aabb_max[0];
+
+    float d2z = player.aabb_min[2] - map.boundaries[i][3];
+    float d2x = player.aabb_min[0] - map.boundaries[i][2];
+
+    if (d1x > 0.0f || d1z > 0.0f){
+        return FALSE;
+    }
+
+    if (d2x > 0.0f || d2z > 0.0f){
+        return FALSE;
+    }
+    return TRUE;
+
+
+}
+void normalize(){
+    
 }
 void keyboard_up(unsigned char key, int x, int y)
 {
@@ -145,63 +171,74 @@ void keyboard_up(unsigned char key, int x, int y)
 }
 
 void keyboard(unsigned char key, int x, int y)
-{
-    for(int i =0; i< map.boundaries.size();i++){
-        float dx = (player.pos[0]+sin(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][0]+1);
-        float dy = (player.pos[2]+cos(player.angle * TO_RADIANS) * 0.5) - (map.boundaries[i][2]+1);
-        float dist = sqrt(dx*dx+dy*dy);
-        if(dist < 1 + 0.8)
-        {
-            player.pos[0] -= sin(player.angle * TO_RADIANS);
-            player.pos[2] -= cos(player.angle * TO_RADIANS); 
+{   
+    bool collision;
+
+    for(int i = 1 ; i < map.boundaries.size();i++){
+        collision = collisionTest(i);
+
+        if(collision){
+               
+            player.pos[0] = player.prevPos[0];
+            player.pos[1] = player.prevPos[1];
+            player.pos[2] = player.prevPos[2];
+            player.updateCamera();
             break;
         }
     }
 
-
-    switch (key)
+    if(!collision)
     {
-    case 'w':
-    case 'W':
-        player.movement.Forward = true;
-        break;
-    case 'a':
-    case 'A':
-        player.movement.rLeft = true;
-        break;
-    case 's':
-    case 'S':
-        player.movement.Backward = true;
-        break;
-    case 'd':
-    case 'D':
-        player.movement.rRight = true;
-        break;
-    case 32:
-        player.shoot();
-        break;
-    case 'r':
-    case 'R':
-        player.cameraReset();
-        break;
-    }
-    player.playerMove();
 
-    glutPostRedisplay();
+        switch (key)
+        {
+        case 'w':
+        case 'W':
+            player.movement.Forward = true;
+            break;
+        case 'a':
+        case 'A':
+            player.movement.rLeft = true;
+            break;
+        case 's':
+        case 'S':
+            player.movement.Backward = true;
+            break;
+        case 'd':
+        case 'D':
+            player.movement.rRight = true;
+            break;
+        case 32:
+            player.shoot();
+            //player.collisionCheck(enemy.aabb_min,enemy.aabb_max);
+            break;
+        case 'r':
+        case 'R':
+            player.cameraReset();
+            break;
+        }
+
+        player.playerMove();
+
+        glutPostRedisplay();
+    }
+
 }
+
+
 void special(int key, int x, int y)
 {
     if (key == GLUT_KEY_RIGHT)
     {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
-            player.tilt += 0.1;
+            player.tilt += 0.01;
         else
             player.dolly += 0.1;
     }
     if (key == GLUT_KEY_LEFT)
     {
         if (glutGetModifiers() == GLUT_ACTIVE_SHIFT)
-            player.tilt -= 0.1;
+            player.tilt -= 0.01;
         else
             player.dolly -= 0.1;
     }
@@ -236,6 +273,14 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH );
 
+
+    glutInitWindowPosition((width-miniWidth), (width-miniHeight));
+    glutInitWindowSize(miniWidth, miniHeight);
+    subWindow = glutCreateWindow("MiniMap");
+    
+    glutDisplayFunc(minimap);
+    glutReshapeFunc(reshape);
+
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(width, height);
     mainWindow = glutCreateWindow("Tank Game");
@@ -249,15 +294,6 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboard_up);
     glutSpecialFunc(special);
-    map.texture.texture();
-    
-    
-    glutInitWindowSize(miniWidth, miniHeight);
-    glutInitWindowPosition((width-miniWidth), (width-miniHeight));
-    subWindow = glutCreateWindow("MiniMap");
-    
-    glutDisplayFunc(minimap);
-    glutReshapeFunc(reshape);
 
     map.texture.texture();
     player.bullets.clear();

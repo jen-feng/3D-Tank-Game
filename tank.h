@@ -43,6 +43,7 @@ public:
     }movement;
     
     float pos[3];
+    float prevPos[3];
     float dir[3];
 
     float camPos[3];
@@ -58,6 +59,8 @@ public:
     int score;
     int bullet_num;
     int bullet_id;
+    float aabb_min[3];
+    float aabb_max[3];
     std::vector<std::vector<GLfloat> > bullets;
 
     Tank();
@@ -71,6 +74,8 @@ public:
     
     void projectileUpdate();
     void drawProjectile();
+    void collisionCheck(float aabb_min[],float aabb_max[]);
+    bool intersectCheck(float norm[],float aabb_min[],float aabb_max[]);
 
 };
 
