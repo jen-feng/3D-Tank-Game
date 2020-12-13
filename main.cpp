@@ -28,6 +28,7 @@ const int miniWidth = 300;
 const int miniHeight = 300;
 GLint mainWindow, subWindow;
 unsigned int fbo;
+int highestScore = 0;
 
 bool move = false;
 
@@ -226,7 +227,15 @@ void keyboard(unsigned char key, int x, int y)
     case 'R':
         player.cameraReset();
         break;
+    case 'n':
+    case 'N':
+        Player newP = Player();
+        player = newP;
+        enemy = Enemy(20, -1, 10, 90);
+        break;
     }
+    
+
     player.playerMove();
     }
     glutPostRedisplay();
