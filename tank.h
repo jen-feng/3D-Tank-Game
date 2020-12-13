@@ -91,6 +91,7 @@ class Player: public Tank
     void draw();
     void drawHUD();
     void drawText(float x, float y, char *inString, int val);
+    void detectEnemy(float posX, float posY, float a);
 };
 
 class Enemy: public Tank
