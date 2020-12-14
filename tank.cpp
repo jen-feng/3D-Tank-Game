@@ -227,11 +227,11 @@ void Tank::move(){
 
     if(movement.Forward){
         
-        pos[0] += sin(angle * TO_RADIANS) * 0.5;
-        pos[2] += cos(angle * TO_RADIANS) * 0.5;
+        pos[0] += sin(angle * TO_RADIANS) * 0.2;
+        pos[2] += cos(angle * TO_RADIANS) * 0.2;
 
-        dir[0] += sin(angle * TO_RADIANS) * 0.5;
-        dir[2] += cos(angle * TO_RADIANS) * 0.5;
+        dir[0] += sin(angle * TO_RADIANS) * 0.2;
+        dir[2] += cos(angle * TO_RADIANS) * 0.2;
 
     }
     if(movement.rLeft){
@@ -243,11 +243,11 @@ void Tank::move(){
     }
     if(movement.Backward){
 
-        pos[0] -= sin(angle * TO_RADIANS) * 0.5;
-        pos[2] -= cos(angle * TO_RADIANS) * 0.5;
+        pos[0] -= sin(angle * TO_RADIANS) * 0.2;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.2;
 
-        dir[0] -= sin(angle * TO_RADIANS) * 0.5;
-        dir[2] -= cos(angle * TO_RADIANS) * 0.5;
+        dir[0] -= sin(angle * TO_RADIANS) * 0.2;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.2;
     }
     if(movement.rRight){
 
@@ -274,8 +274,6 @@ void Tank::move(){
 //shoot function that creates a bullet object and saves the neccessary direction and pos
 void Tank::shoot()
 {
-    
-    std::cout<<"shoot"<<"\n";
     int size = bullets.size();
     if (size <= bullet_num)
     {
@@ -450,7 +448,7 @@ void Player::drawHUD(){
         glVertex2f(w/2 + 190,h/2 + 190);
         glVertex2f(w/2 - 190,h/2 + 190);
 	    glEnd();
-        char msg[] = "You collided with Enemy!\0";
+        char msg[] = "Game over. You have no more lives!\0";
         char restart[] = "Click to Restart Game\0";
         drawText(w/2-170,h/2, msg, 0);
         drawText(w/2-170,h/2+40, restart, 0);
