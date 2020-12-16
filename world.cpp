@@ -2,6 +2,8 @@
 #include "world.h"
 #include "PPM.cc"
 
+bool first = true;
+
 world::world()
 {
     m_ambient[0] = 0.1f; m_ambient[1] = 0.1f; m_ambient[2] = 0.05f;  m_ambient[3] = 1.0f;
@@ -33,16 +35,16 @@ void world::drawWorld()
         
         glBegin(GL_QUADS);
         glTexCoord2f(uvs[i][0], uvs[i][1]);
-        glNormal3f(normals[normalIndices[i] - 1][0], normals[normalIndices[i] - 1][1], normals[normalIndices[i] - 1][2]);
+        glNormal3f(normals[i][0], normals[i][1], normals[i][2]);
         glVertex3f(vertices[i][0], vertices[i][1], vertices[i][2]);
         glTexCoord2f(uvs[i+1][0], uvs[i+1][1]);
-        glNormal3f(normals[normalIndices[i + 1] - 1][0], normals[normalIndices[i + 1] - 1][1], normals[normalIndices[i + 1] - 1][2]);
+        glNormal3f(normals[i + 1][0], normals[i + 1][1], normals[i + 1][2]);
         glVertex3f(vertices[i + 1][0], vertices[i + 1][1], vertices[i + 1][2]);
         glTexCoord2f(uvs[i+2][0], uvs[i+2][1]);
-        glNormal3f(normals[normalIndices[i + 2] - 1][0], normals[normalIndices[i + 2] - 1][1], normals[normalIndices[i + 2] - 1][2]);
+        glNormal3f(normals[i + 2][0], normals[i + 2][1], normals[i + 2][2]);
         glVertex3f(vertices[i + 2][0], vertices[i + 2][1], vertices[i + 2][2]);
         glTexCoord2f(uvs[i+3][0], uvs[i+3][1]);
-        glNormal3f(normals[normalIndices[i + 3] - 1][0], normals[normalIndices[i + 3] - 1][1], normals[normalIndices[i + 3] - 1][2]);
+        glNormal3f(normals[i + 3][0], normals[i + 3][1], normals[i + 3][2]);
         glVertex3f(vertices[i + 3][0], vertices[i + 3][1], vertices[i + 3][2]);
         glEnd();
     }
@@ -99,17 +101,17 @@ bool world::loadObj(const char *fname,
                     std::vector<std::vector<GLfloat> > &out_normals)
 {
     printf("Loading OBJ file %s...\n", fname);
-    std::vector<std::vector<GLfloat>> temp_vertices;
-    std::vector<std::vector<GLfloat>> temp_uvs;
-    std::vector<std::vector<GLfloat>> temp_normals;
+    std::vector<std::vector<GLfloat> > temp_vertices;
+    std::vector<std::vector<GLfloat> > temp_uvs;
+    std::vector<std::vector<GLfloat> > temp_normals;
     FILE *fp;
     int read;
     GLfloat x, y, z;
     char ch;
-    float minX = 10000;
-    float minZ = 10000;
-    float maxX = -10000;
-    float maxZ = -10000;
+    float minX;
+    float minZ;
+    float maxX;
+    float maxZ;
     fp = fopen(fname, "r");
     if (!fp)
     {
@@ -129,16 +131,22 @@ bool world::loadObj(const char *fname,
         {
             std::vector<GLfloat> v;
             fscanf(fp, "%f %f %f\n", &x, &y, &z);
+            if(first){
+
+                minX = x;maxX = x;
+                minZ = z;maxZ = z;
+                first = false;
+            }
             if(x < minX){
                 minX = x;
             }
             else if(x > maxX){
                 maxX = x;
             }
-            if(y < minZ){
+            if(z < minZ){
                 minZ = z;
             }
-            else if(y > maxZ){
+            else if(z > maxZ){
                 maxZ = z;
             }
             v.push_back(x);
@@ -149,6 +157,9 @@ bool world::loadObj(const char *fname,
         }
         else if (strcmp(lineHeader, "vt") == 0)
         {
+
+            
+
             std::vector<GLfloat> vt;
             fscanf(fp, "%f %f\n", &x, &y);
             vt.push_back(x);
@@ -193,13 +204,10 @@ bool world::loadObj(const char *fname,
         }
         else if(strcmp(lineHeader, "o") == 0)
         {
+            first = true;
             std::vector<GLfloat> b;
-            b.push_back(minX);b.push_back(maxX);b.push_back(minZ);b.push_back(maxZ);
+            b.push_back(minX);b.push_back(minZ);b.push_back(maxX);b.push_back(maxZ);
             boundaries.push_back(b);
-            minX = 10000;
-            minZ = 10000;
-            maxX = -10000;
-            maxZ = -10000;
         }
     }
 

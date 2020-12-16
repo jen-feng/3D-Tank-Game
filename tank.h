@@ -43,6 +43,7 @@ public:
     }movement;
     
     float pos[3];
+    float prevPos[3];
     float dir[3];
 
     float camPos[3];
@@ -58,6 +59,8 @@ public:
     int score;
     int bullet_num;
     int bullet_id;
+    float aabb_min[3];
+    float aabb_max[3];
     std::vector<std::vector<GLfloat> > bullets;
 
     Tank();
@@ -82,14 +85,23 @@ class Player: public Tank
 
     void playerMove();
     void updateCamera();
+    void cameraReset();
     void draw();
     void drawHUD();
     void drawText(float x, float y, char *inString, int val);
+    void detectEnemy(float posX, float posY, float a);
 };
 
 class Enemy: public Tank
 {
     public:
+
+    float nextX;
+    float nextY;
+    float nextPos[3];
+    bool rotate;
+    float dist;
+    float ang;
 
     Enemy(float x, float y, float z, float ang);
 

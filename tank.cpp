@@ -1,5 +1,8 @@
 #include "main.h"
 
+bool first1 = true;
+
+//initialize the variables for the tank object
 Tank::Tank()
 {
     light_pos[0] = -5; light_pos[1] = 5; light_pos[2] = 5; light_pos[3] = 1.0;
@@ -35,7 +38,7 @@ Tank::Tank()
 
 
 }
-
+//loading the .obj file
 bool Tank::loadObj(const char *fname,
                    std::vector<std::vector<GLfloat> > &out_vertices,
                    std::vector<std::vector<GLfloat> > &out_uvs,
@@ -72,17 +75,23 @@ bool Tank::loadObj(const char *fname,
         {
             std::vector<GLfloat> v;
             fscanf(fp, "%f %f %f\n", &x, &y, &z);
+            if(first1){
+
+                minX = x;maxX = x;
+                minZ = z;maxZ = z;
+                first1 = false;
+            }
             if(x < minX){
                 minX = x;
             }
             else if(x > maxX){
                 maxX = x;
             }
-            if(y < minZ){
-                minZ = y;
+            if(z < minZ){
+                minZ = z;
             }
-            else if(y > maxZ){
-                maxZ = y;
+            else if(z > maxZ){
+                maxZ = z;
             }
             v.push_back(x);
             v.push_back(y);
@@ -139,6 +148,7 @@ bool Tank::loadObj(const char *fname,
     boundaries.push_back(maxX);
     boundaries.push_back(minZ);
     boundaries.push_back(maxZ);
+    first1 = false;
 
     for (unsigned int i = 0; i < vertexIndices.size(); i++)
     {
@@ -162,6 +172,7 @@ bool Tank::loadObj(const char *fname,
     return true;
 }
 
+//Draw tank using the values from the loaded obj file
 void Tank::drawTank()
 {
     
@@ -209,53 +220,54 @@ void Tank::drawTank()
     
 }
 
-  
+//Movement calulations based on the button pressed
 void Tank::move(){
 
     if(movement.Forward){
-        
-        pos[0] += sin(angle * TO_RADIANS) * 0.5;
-        pos[2] += cos(angle * TO_RADIANS) * 0.5;
+        pos[0] += sin(angle * TO_RADIANS) * 0.2;
+        pos[2] += cos(angle * TO_RADIANS) * 0.2;
 
-        dir[0] += sin(angle * TO_RADIANS) * 0.5;
-        dir[2] += cos(angle * TO_RADIANS) * 0.5;
-
+        dir[0] += sin(angle * TO_RADIANS) * 0.2;
+        dir[2] += cos(angle * TO_RADIANS) * 0.2;
     }
     if(movement.rLeft){
 
-        angle++;
+        angle+=2;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
     }
     if(movement.Backward){
 
-        pos[0] -= sin(angle * TO_RADIANS) * 0.5;
-        pos[2] -= cos(angle * TO_RADIANS) * 0.5;
+        pos[0] -= sin(angle * TO_RADIANS) * 0.2;
+        pos[2] -= cos(angle * TO_RADIANS) * 0.2;
 
-        dir[0] -= sin(angle * TO_RADIANS) * 0.5;
-        dir[2] -= cos(angle * TO_RADIANS) * 0.5;
+        dir[0] -= sin(angle * TO_RADIANS) * 0.2;
+        dir[2] -= cos(angle * TO_RADIANS) * 0.2;
     }
     if(movement.rRight){
 
-        angle--;
+        angle-=2;
 
         dir[0] = sin(angle * TO_RADIANS) + pos[0];
         dir[2] = cos(angle * TO_RADIANS) + pos[2];
-
-        // boundaries[0] = sin(angle * TO_RADIANS) + pos[0] - dx / 2;
-        // boundaries[1] = sin(angle * TO_RADIANS) + pos[0] + dx / 2;
-        // boundaries[2] = cos(angle * TO_RADIANS) + pos[2] - dz / 2;
-        // boundaries[3] = cos(angle * TO_RADIANS) + pos[2] + dz / 2;
     }
 
+    //printf("pos: %f %f %f\ndir: %f %f %f\n",pos[0],pos[1],pos[2],dir[0],dir[1],dir[2]);
 
+    //aabb is modified with the current position of the tank
+    aabb_min[0] = pos[0] - 1;
+    aabb_min[1] = pos[1] - 1;
+    aabb_min[2] = pos[2] - 1;
+
+    aabb_max[0] = pos[0] + 1;
+    aabb_max[1] = pos[1] + 1;
+    aabb_max[2] = pos[2] + 1;
 }
 
+//shoot function that creates a bullet object and saves the neccessary direction and pos
 void Tank::shoot()
 {
-    
-   
     int size = bullets.size();
     if (size <= bullet_num)
     {
@@ -278,9 +290,9 @@ void Tank::shoot()
     }
 } 
 
+//draws the projectile at its defined coordinates
 void Tank::drawProjectile()
 {
-    
     for (int i = 0; i < bullets.size(); i++)
     {
         if (fabs(bullets[i][3]) >= 1)
@@ -295,6 +307,7 @@ void Tank::drawProjectile()
     }
 }
 
+//called when the projectile needs to be updated in the current direction its going
 void Tank::projectileUpdate()
 {
     for (int i = 0; i < bullets.size(); i++)
@@ -309,7 +322,7 @@ void Tank::projectileUpdate()
     }
 }
 
-
+//Player class that inherets all the Tank Methods
 Player::Player():Tank(){
 
     m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
@@ -320,7 +333,7 @@ Player::Player():Tank(){
     // loadObj("14079_WWII_Tank_UK_Cromwell_v1_L2.obj", vertices, uvs, normals);
     loadObj("small.obj", vertices, uvs, normals);
 
-    pos[0] = 2; pos[1] = 1; pos[2] = 2;
+    pos[0] = -1; pos[1] = 1; pos[2] = 0;
 
     angle = 0;
     dir[0] = sin(angle * TO_RADIANS) + pos[0];
@@ -330,18 +343,28 @@ Player::Player():Tank(){
     truck = 0.0;
     dolly = 0;
     boom = 0.3;
-    tilt = -0.2;
+    tilt = 0;
 
     updateCamera();
+
+    aabb_min[0] = pos[0] - 1;
+    // aabb_min[1] = pos[1] + 1;
+    aabb_min[2] = pos[2] - 1;
+
+    aabb_max[0] = pos[0] + 1;
+    // aabb_max[1] = pos[1] - 1;
+    aabb_max[2] = pos[2] + 1;
+
+    //printf("%f %f\n%f %f\n",pos[0],pos[2], aabb_min[0],aabb_min[2]);
 }
 
+//player move method for keeping the camera updated as well
 void Player::playerMove(){
     move();
     updateCamera();
 }
 
 void Player::draw(){
-
     drawProjectile();
     glPushMatrix();
         glTranslatef(pos[0], -1, pos[2]);
@@ -350,6 +373,7 @@ void Player::draw(){
     glPopMatrix();
 }
 
+//HUD drawing method
 void Player::drawHUD(){
     /*  
     HUD:
@@ -359,11 +383,14 @@ void Player::drawHUD(){
     MiniMap?
     */
 
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
 
-    gluOrtho2D(0,glutGet(GLUT_WINDOW_WIDTH), 0, glutGet(GLUT_WINDOW_HEIGHT));
+    gluOrtho2D(0,w, 0, h);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -371,10 +398,21 @@ void Player::drawHUD(){
 
     //Draw HUD STUFF
 
+    // > +x
+    // ^ +y
     
-    
-    glBegin(GL_QUADS);
+    //crosshair
+    glBegin(GL_LINES);
+        glColor3f(0, 1, 0);
+        glScalef(0.2, 0.2, 0.2);
+        glVertex2f((w/2)-15,(h/2)-25);
+        glVertex2f((w/2)+15,(h/2)-25);
+        glVertex2f((w/2),(h/2)-10);
+        glVertex2f((w/2),(h/2)-40);
+	glEnd();
 
+    //bottom left display
+    glBegin(GL_QUADS);
         glColor3f(0.5, 0.5, 0.5);
         glVertex2f(0,0);
         glVertex2f(160,0);
@@ -386,13 +424,35 @@ void Player::drawHUD(){
         glVertex2f(150,5);
         glVertex2f(100,100);
         glVertex2f(5,100);
-        
 	glEnd();
-    
+
+    //restart menu
+    if(lives == 0)
+    {
+        glBegin(GL_LINES);
+        glColor3f(0.5, 0.5, 0.5);
+        glVertex2f(w/2 - 200,h/2 - 200);
+        glVertex2f(w/2 + 200,h/2 - 200);
+        glVertex2f(w/2 + 200,h/2 + 200);
+        glVertex2f(w/2 - 200,h/2 + 200);
+	    glEnd();
+        
+        glBegin(GL_QUADS);
+        glColor3f(1, 1, 1);
+        glVertex2f(w/2 - 190,h/2 - 190);
+        glVertex2f(w/2 + 190,h/2 - 190);
+        glVertex2f(w/2 + 190,h/2 + 190);
+        glVertex2f(w/2 - 190,h/2 + 190);
+	    glEnd();
+        char msg[] = "Game over. You have no more lives!\0";
+        char restart[] = "Click to Restart Game\0";
+        drawText(w/2-170,h/2, msg, 0);
+        drawText(w/2-170,h/2+40, restart, 0);
+    }
     char livesStr[] = "Lives: %d\0";
     char scoreStr[] = "Score: %d\0";
 
-    
+    //text in the bottom left HUD element
     drawText(8,55,livesStr,lives);
 
     drawText(10,10,scoreStr,score);
@@ -405,12 +465,12 @@ void Player::drawHUD(){
 
 
 }
-
+//method for drawing text
 void Player::drawText(float x, float y, char *inString, int val){
 
     char outputStr[50];
 
-    sprintf(outputStr, inString, score);
+    sprintf(outputStr, inString, val);
 
     glPushMatrix();
 
@@ -426,9 +486,10 @@ void Player::drawText(float x, float y, char *inString, int val){
     glPopMatrix();
 }
 
+//method that allows movement of the First person camera while moving the tank
 void Player::updateCamera(){
     camPos[0] = ((sin(angle * TO_RADIANS) * truck) + pos[0]) + (sin((angle-90) * TO_RADIANS)*dolly);
-    camPos[1] = pos[1] + boom;
+    camPos[1] = 1 + boom;
     camPos[2] = ((cos(angle * TO_RADIANS) * truck) + pos[2]) + (cos((angle-90) * TO_RADIANS)*dolly);
 
     camDir[0] = ((sin((angle-90) * TO_RADIANS)*dolly) + dir[0]);
@@ -436,6 +497,28 @@ void Player::updateCamera(){
     camDir[2] = ((cos((angle-90) * TO_RADIANS)*dolly) + dir[2]);
 }
 
+//When R is pressed it puts the camera back to default position
+void Player::cameraReset(){
+    truck = 0.0;
+    dolly = 0;
+    boom = 0.3;
+    tilt = 0;
+
+    updateCamera();
+}
+
+//Check if the enemy has collided with the player
+void Player::detectEnemy(float posX, float posZ, float a){
+    float dx = (posX+sin(a * TO_RADIANS) * 0.3) - (pos[0]+sin(angle * TO_RADIANS) * 0.3);
+    float dy = (posZ+cos(a * TO_RADIANS) * 0.3) - (pos[2]+sin(angle * TO_RADIANS) * 0.3);
+    float dist = sqrt(dx*dx+dy*dy);
+    if(dist < 3)
+    {
+        lives=0;
+    }
+}
+
+//Enemy class that inherets the tank class
 Enemy::Enemy(float x, float y, float z, float angle):Tank(){
 
     m_ambient[0] = 0.0f; m_ambient[1] = 0.0f; m_ambient[2] = 0.0f;  m_ambient[3] = 1.0f;
@@ -448,27 +531,39 @@ Enemy::Enemy(float x, float y, float z, float angle):Tank(){
     pos[0] = x; pos[1] = y; pos[2] = z;
 
     this->angle = angle;
-    dir[0] = sin(angle * TO_RADIANS) + pos[0];
+    dir[0] = sin(this->angle * TO_RADIANS) + pos[0];
     dir[1] = 1;
-    dir[2] = cos(angle * TO_RADIANS) + pos[2];
+    dir[2] = cos(this->angle * TO_RADIANS) + pos[2];
+
+    nextPos[0] = 0; nextPos[1] = 0; nextPos[2] = 0;
+
+    ang = 0;
+    dist = 0;
+
+    aabb_min[0] = pos[0] - 1;
+    aabb_min[1] = 1;
+    aabb_min[2] = pos[2] - 1;
+
+    aabb_max[0] = pos[0] + 1;
+    aabb_max[1] = 0;
+    aabb_max[2] = pos[2] + 1;
 
 }
 
-
-
+//This allows the enemy tank to move within the boundaries of the maze
 void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
-    pos[0] += sin(angle * TO_RADIANS)*0.1;
-    pos[2] += cos(angle * TO_RADIANS)*0.1;
+    pos[0] += sin(angle * TO_RADIANS)*0.3;
+    pos[2] += cos(angle * TO_RADIANS)*0.3;
     for (int i = 0; i < boundaries.size(); i++)
     {
         float dx = (pos[0] + sin(angle * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
-        float dy = (pos[2] + cos(angle * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float dy = (pos[2] + cos(angle * TO_RADIANS) * 0.5) - (boundaries[i][1] + 1);
         float dist = sqrt(dx * dx + dy * dy);
         float ddx = (pos[0] + sin((angle+90) * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
-        float ddy = (pos[2] + cos((angle+90) * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float ddy = (pos[2] + cos((angle+90) * TO_RADIANS) * 0.5) - (boundaries[i][1] + 1);
         float dist2 = sqrt(ddx * ddx + ddy * ddy);
         float dddx = (pos[0] + sin((angle-90) * TO_RADIANS) * 0.5) - (boundaries[i][0] + 1);
-        float dddy = (pos[2] + cos((angle-90) * TO_RADIANS) * 0.5) - (boundaries[i][2] + 1);
+        float dddy = (pos[2] + cos((angle-90) * TO_RADIANS) * 0.5) - (boundaries[i][1] + 1);
         float dist3 = sqrt(dddx * dddx + dddy * dddy);
         int n = rand() % 12;
         int n1 = rand() % 1000;
@@ -484,7 +579,7 @@ void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
             if(n == 7) angle -= 45;
             if(n == 8) angle += 180;
             if(n == 9) angle -= 90;
-            if(n == 10) angle += 45;
+            if(n == 10) angle -= 45;
             if(n == 1) angle += 90;
             dir[0] = sin(angle * TO_RADIANS) + pos[0];
             dir[2] = cos(angle * TO_RADIANS) + pos[2];
@@ -497,19 +592,47 @@ void Enemy::findPath(std::vector<std::vector<GLfloat> > boundaries){
             break;
         }
     }
-    int n3 = rand() % 100;
-    if (n3 == 56 || n3 == 78) shoot();
+    int n3 = rand() % 50;
+    if (n3 == 15 || n3 == 40) shoot();
 }
+
+//depreciated position update
 void Enemy::updatePosition(){
+    rotate = true;
+
+    if(rotate){
+        if(angle > ang){
+            movement.rRight = true;
+        }
+        else
+            movement.rLeft = true;
+        
+
+        if(ang == angle){
+            
+            rotate = false;
+            movement.rRight = false;
+            movement.rLeft = false;
+        }
+    }
+    if(rotate == false){
+
+        if((pos[0] == nextPos[0]) && (pos[2] == nextPos[2])){
+            movement.Forward = false;
+        }
+        else
+            movement.Forward = true;
+
+    }
+
+    move();
 
 }
 
 void Enemy::draw(){
-    
     drawProjectile();
-
     glPushMatrix();
-        glTranslatef(pos[0], pos[1], pos[2]);
+        glTranslatef(pos[0], -1, pos[2]);
         glRotatef(angle, 0, 1, 0);
         glPushMatrix();
         glTranslatef(0, 5,0);
