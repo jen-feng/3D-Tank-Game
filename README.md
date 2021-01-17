@@ -8,9 +8,9 @@ Taking inspiration from other games where you control a tank and move around a m
 ## Screenshot of the game
 ![Gameview1](https://github.com/jen-feng/3D-Tank-Game/blob/main/gameview1.png)
 
-![Gameview2](https://github.com/jen-feng/3D-Tank-Game/blob/main/gameview1.png)
+![Gameview2](https://github.com/jen-feng/3D-Tank-Game/blob/main/gameview2.png)
 
-![Minimap](https://github.com/jen-feng/3D-Tank-Game/blob/main/gameview1.png)
+![Minimap](https://github.com/jen-feng/3D-Tank-Game/blob/main/minimap.png)
 
 ## How to run
 - This program works if you have OpenGL set up on your system.
